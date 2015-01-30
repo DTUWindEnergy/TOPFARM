@@ -5,22 +5,58 @@ TOPFARM is a wind farm optimization framework developed by DTU Wind Energy, base
 
 ## Dependencies and supported Python versions
 
-TOPFARM depends of on [OpenMDAO](https://github.com/OpenMDAO/OpenMDAO-Framework) and [FUSED-Wind](https://github.com/fusedwind/fusedwind) and support python
+TOPFARM depends of on [OpenMDAO v0.10.3](https://github.com/OpenMDAO/OpenMDAO-Framework) and [FUSED-Wind v0.1](https://github.com/fusedwind/fusedwind) and support python
 2.7.x.
 
 ## Development installation
 
-First install [OpenMDAO development](https://github.com/OpenMDAO/OpenMDAO-Framework) and 
-[FUSED-Wind](https://github.com/fusedwind/fusedwind) from their repositories
-and activate its virtual environment.
+### Automatic installation
+If you are on Linux of MacOSX, you can try to run the following script to install everything in a new virtual environment
+
+    $ install_all.sh
+
+### Manual installation
+Create a new topfarm directory
+
+    $ mkdir topfarm
+    $ cd topfarm
+    
+Install `virtualenv`, if you don't already have it available
+ 
+    $ easy_install virtualenv
+    
+Then create a new virtual environement and activate it
+
+    $ virtualenv topfarmv
+    $ . topfarmv/bin/activate
+
+Install the pre-requisits to OpenMDAO (if it doesn't work, make sure that you have your [latest version of pip](http://stackoverflow.com/questions/26575587/cant-install-scipy-through-pip))
+
+    $ pip install numpy scipy
+
+Install [OpenMDAO development v0.10.3](https://github.com/OpenMDAO/OpenMDAO-Framework/tree/0.10.3).
+
+    $ wget https://github.com/OpenMDAO/OpenMDAO-Framework/archive/0.10.3.zip
+    $ unzip 0.10.3.zip
+    $ cd OpenMDAO-Framework-0.10.3
+    $ go-openmdao-dev.py
+    
+... coffee break ...
+
+Then install [FUSED-Wind](https://github.com/fusedwind/fusedwind) from their repositories
+
+    $ cd ..
+    $ wget https://github.com/FUSED-Wind/fusedwind/archive/v0.1.0.zip
+    $ unzip v0.1.0.zip
+    $ cd fusedwind
+    $ plugin install
+    $ cd ..
 
 Then run the following commands to download and install TOPFARM
 
-    $ git clone xxx
+    $ git clone git@github.com:DTUWindEnergy/FUSED-TOPFARM.git
     $ cd topfarm
     $ plugin install
-
-
 
 ## Documentation
 
