@@ -57,7 +57,7 @@ Then install [FUSED-Wind](https://github.com/fusedwind/fusedwind) from their rep
 
 Then run the following commands to download and install TOPFARM
 
-    $ git clone git@github.com:DTUWindEnergy/FUSED-TOPFARM.git
+    $ git clone git@github.com:DTUWindEnergy/TOPFARM.git
     $ cd topfarm
     $ plugin install
 
