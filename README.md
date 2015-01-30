@@ -76,7 +76,7 @@ github issue page and create an issue there.
 ## Supporting TOPFARM development
 We believe in Open Science, in accelerating science development by collaborating with each other through our codes. 
 This is why we have put TOPFARM in open source and open access on github.com. But this requires trust that our users will 
-give back to the community. We our a pilote project at DTU Wind Energy, and for that reason it is very important for us
+give back to the community. We are a pilote project at DTU Wind Energy, and for that reason it is very important for us
 to prove to our administration that this is the way forward, and that sharing codes does not mean being ripped off by the
 users. You can support our efforts in the following ways.
  
