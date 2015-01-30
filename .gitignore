@@ -1,54 +1,105 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
 *.py[cod]
+
+# Sphinx
+_build
+generated
+
+# XCode
+*.xcodeproj
 
 # C extensions
 *.so
 
-# Distribution / packaging
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
+# Packages
 *.egg
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+# lib
+lib64
+__pycache__
 
 # Installer logs
 pip-log.txt
-pip-delete-this-directory.txt
 
 # Unit test / coverage reports
-htmlcov/
-.tox/
 .coverage
-.cache
+.tox
 nosetests.xml
-coverage.xml
 
 # Translations
 *.mo
-*.pot
 
-# Django stuff:
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
 *.log
+*.sql
+*.sqlite
 
-# Sphinx documentation
-docs/_build/
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
 
-# PyBuilder
-target/
+# OpenMDAO stuff:
+# #################
+openmdao_log.txt
+
+# TOPFARM result files
+# ####################
+layout*csv
+*.png
+
+# Ipython temporary files
+#########################
+.ipynb_checkpoints*
+
+
+# Sublime stuff
+#########################
+*.*sublime*
+
+# PyCharm stuff
+#########################
+.idea*
