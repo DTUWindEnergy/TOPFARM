@@ -1,0 +1,3 @@
+graft src/topfarm/sphinx_build/html
+recursive-include src/topfarm/test *.py
+
