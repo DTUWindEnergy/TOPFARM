@@ -49,16 +49,17 @@ Install [OpenMDAO development v0.10.3](https://github.com/OpenMDAO/OpenMDAO-Fram
 Then install [FUSED-Wind](https://github.com/fusedwind/fusedwind) from their repositories
 
     $ cd ..
-    $ wget https://github.com/FUSED-Wind/fusedwind/archive/v0.1.0.zip
+    $ git clone https://github.com/FUSED-Wind/fusedwind.git
     $ cd fusedwind
     $ git checkout v0.1.0  
     $ plugin install
+    $ cd ..
 
 
 Then run the following commands to download and install TOPFARM
 
-    $ git clone git@github.com:DTUWindEnergy/FUSED-TOPFARM.git
-    $ cd topfarm
+    $ git clone git@github.com:DTUWindEnergy/TOPFARM.git
+    $ cd TOPFARM
     $ plugin install
 
 ## Documentation
