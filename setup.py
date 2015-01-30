@@ -6,24 +6,24 @@
 
 from setuptools import setup, find_packages
 
-kwargs = {'author': 'Pierre-Elouan Rethore',
- 'author_email': 'pire@dtu.dk',
+kwargs = {'author': '',
+ 'author_email': '',
  'classifiers': ['Intended Audience :: Science/Research',
                  'Topic :: Scientific/Engineering'],
  'description': 'A wind plant layout optimization tool',
- 'download_url': 'https://github.com/DTUWindEnergy/FUSED-TOPFARM',
+ 'download_url': '',
  'include_package_data': True,
  'install_requires': ['openmdao.main'],
  'keywords': ['openmdao'],
- 'license': 'AGPL v3.0',
- 'maintainer': 'Pierre-Elouan Rethore',
- 'maintainer_email': 'pire@dtu.dk',
+ 'license': '',
+ 'maintainer': '',
+ 'maintainer_email': '',
  'name': 'topfarm',
  'package_data': {'topfarm': []},
  'package_dir': {'': 'src'},
  'packages': ['topfarm'],
- 'url': 'https://github.com/DTUWindEnergy/FUSED-TOPFARM',
- 'version': '0.01',
+ 'url': '',
+ 'version': '',
  'zip_safe': False}
 
 
