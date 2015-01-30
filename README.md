@@ -36,21 +36,24 @@ Install the pre-requisits to OpenMDAO (if it doesn't work, make sure that you ha
 
 Install [OpenMDAO development v0.10.3](https://github.com/OpenMDAO/OpenMDAO-Framework/tree/0.10.3).
 
-    $ wget https://github.com/OpenMDAO/OpenMDAO-Framework/archive/0.10.3.zip
-    $ unzip 0.10.3.zip
-    $ cd OpenMDAO-Framework-0.10.3
+
+    $ git clone https://github.com/OpenMDAO/OpenMDAO-Framework.git
+    $ cd OpenMDAO-Framework
+    $ git checkout 0.10.3  
     $ go-openmdao-dev.py
     
 ... coffee break ...
+
+    $ cd ..
 
 Then install [FUSED-Wind](https://github.com/fusedwind/fusedwind) from their repositories
 
     $ cd ..
     $ wget https://github.com/FUSED-Wind/fusedwind/archive/v0.1.0.zip
-    $ unzip v0.1.0.zip
     $ cd fusedwind
+    $ git checkout v0.1.0  
     $ plugin install
-    $ cd ..
+
 
 Then run the following commands to download and install TOPFARM
 
