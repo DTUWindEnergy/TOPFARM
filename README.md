@@ -49,7 +49,7 @@ Install [OpenMDAO development v0.10.3](https://github.com/OpenMDAO/OpenMDAO-Fram
 Then install [FUSED-Wind](https://github.com/fusedwind/fusedwind) from their repositories
 
     $ cd ..
-    $ wget https://github.com/FUSED-Wind/fusedwind/archive/v0.1.0.zip
+    $ wget https://github.com/FUSED-Wind.git
     $ cd fusedwind
     $ git checkout v0.1.0  
     $ plugin install
