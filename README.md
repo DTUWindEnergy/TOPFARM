@@ -1,11 +1,11 @@
 #TOPFARM
 
-TOPFARM is a wind farm optimization framework developed by DTU Wind Energy, based on [FUSED-Wind](http://www.fusedwind.org) and [OpenMDAO](http://www.openmdao.ord).
+TOPFARM is a wind farm optimization tool under development by DTU Wind Energy, based on [FUSED-Wind](http://www.fusedwind.org) and [OpenMDAO](http://www.openmdao.ord).
 
 
 ## Dependencies and supported Python versions
 
-TOPFARM depends of on [OpenMDAO v0.10.3](https://github.com/OpenMDAO/OpenMDAO-Framework) and [FUSED-Wind v0.1](https://github.com/fusedwind/fusedwind) and support python
+TOPFARM depends of on [OpenMDAO v0.10.3](https://github.com/OpenMDAO/OpenMDAO-Framework) and [FUSED-Wind v0.1.0](https://github.com/fusedwind/fusedwind) and supports python
 2.7.x.
 
 ## Development installation
@@ -76,6 +76,15 @@ discuss various topics related to TOPFARM platform.
 
 If you have specific issues to discuss such as bug report or feature request, it's probably more effective to go to the 
 github issue page and create an issue there.
+
+## License
+
+TOPFARM is available both under the [GNU Affero General Public License v3.0](http://en.wikipedia.org/wiki/Affero_General_Public_License) 
+(AGPL3) and under a custom based commercial license available upon request. 
+The AGPL3 license is an open source license, so you are welcome to use and modify the code as you wish. 
+Note that AGPL3 is also a copyleft license, which means that derived works can only be distributed (or made available
+as an online service) as open source, under the same license terms. For more information about this issue, feel free to contact us.
+
 
 ## Supporting TOPFARM development
 We believe in Open Science, in accelerating science development by collaborating with each other through our codes. 
