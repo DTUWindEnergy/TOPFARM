@@ -6,24 +6,27 @@
 
 from setuptools import setup, find_packages
 
-kwargs = {'author': '',
- 'author_email': '',
+kwargs = {'author': 'Pierre-Elouan Rethore',
+ 'author_email': 'pire@dtu.dk',
  'classifiers': ['Intended Audience :: Science/Research',
                  'Topic :: Scientific/Engineering'],
  'description': 'A wind plant layout optimization tool',
- 'download_url': '',
+ 'download_url': 'https://github.com/DTUWindEnergy/TOPFARM.git',
  'include_package_data': True,
  'install_requires': ['openmdao.main'],
  'keywords': ['openmdao'],
- 'license': '',
- 'maintainer': '',
- 'maintainer_email': '',
+ 'license': 'AGPL v3.0',
+ 'maintainer': 'Pierre-Elouan Rethore',
+ 'maintainer_email': 'pire@dtu.dk',
  'name': 'topfarm',
  'package_data': {'topfarm': []},
  'package_dir': {'': 'src'},
  'packages': ['topfarm'],
- 'url': '',
- 'version': '',
+ 'install_requires': ['numpy', 'scipy', 'pandas', 'matplotlib', 'seaborn','fusedwind','pyopt'],
+ 'dependency_links': ['https://github.com/FUSED-Wind/fusedwind.git@v0.1.0#egg=fusedwind',
+                      'http://svn.pyopt.org/tags/release-1.2.0#egg=pyopt'],
+ 'url': 'https://github.com/DTUWindEnergy/TOPFARM',
+ 'version': '0.1.0',
  'zip_safe': False}
 
 

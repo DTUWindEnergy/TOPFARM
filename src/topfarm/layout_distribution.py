@@ -16,7 +16,7 @@
 
 __author__ = 'Pierre-Elouan Rethore'
 __email__ = "pire@dtu.dk"
-__version__ = '0.01a'
+__version__ = '0.1.0'
 __copyright__ = "Copyright 2015, DTU Wind Energy, TOPFARM Development Team"
 __license__ = "AGPL v3"
 __status__ = "Alpha"
@@ -24,7 +24,9 @@ __status__ = "Alpha"
 from openmdao.lib.datatypes.api import VarTree, Float, Slot, Array, List, Int, Str, Dict, Enum
 from openmdao.main.api import Component
 from numpy import zeros
-from lib import *
+
+from tlib import point_in_poly, PolyFill
+import numpy as np
 
 spiral = lambda t_, a_, x_: [a_*t_**(1./x_) * np.cos(t_), a_*t_**(1./x_) * np.sin(t_)]
 

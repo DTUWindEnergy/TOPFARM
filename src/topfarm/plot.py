@@ -16,7 +16,7 @@
 
 __author__ = 'Pierre-Elouan Rethore'
 __email__ = "pire@dtu.dk"
-__version__ = '0.01a'
+__version__ = '0.1.0'
 __copyright__ = "Copyright 2015, DTU Wind Energy, TOPFARM Development Team"
 __license__ = "AGPL v3"
 __status__ = "Alpha"
@@ -26,8 +26,8 @@ from openmdao.main.api import Component
 import seaborn as sns
 import numpy as np
 from path import path as pa
-from lib import *
-import matplotlib.pylab as plt
+from tlib import *
+import matplotlib as plt
 
 from IPython.display import display, clear_output
 

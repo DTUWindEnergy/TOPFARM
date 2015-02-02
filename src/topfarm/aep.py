@@ -17,7 +17,7 @@
 
 __author__ = 'Pierre-Elouan Rethore'
 __email__ = "pire@dtu.dk"
-__version__ = '0.01a'
+__version__ = '0.1.0'
 __copyright__ = "Copyright 2015, DTU Wind Energy, TOPFARM Development Team"
 __license__ = "AGPL v3"
 __status__ = "Alpha"
@@ -36,51 +36,51 @@ from fusedwind.interface import InterfaceSlot, implement_base
 from fusedwind.plant_flow.comp import GenericWindFarm
 
 # GCLarsen import
-from gclarsen.fused import FGCLarsen
+#from gclarsen.fused import FGCLarsen
 
 # Other
 import numpy as np
 from scipy.interpolate import interp1d
 
 
-
-class TopFGCLarsen(FGCLarsen):
-    """
-    Calculate the wind turbine power using the GCLarsen model.
-    This version gives the standard FGCLarsen interfaces, but replace the wt_layout.wt_positions by the input
-    wt_positions. This is done to speed-up the variable copy in openMDAO. The idea is that at each iteration, it's not
-    necessary to copy arround wt_layout.
-    """
-    wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
-    
-    def execute(self):
-        self.wt_layout.wt_positions = self.wt_positions
-        super(TopFGCLarsen, self).execute()
-
-class TopAEP(AEPMultipleWindRoses):
-    """
-    Calculate the AEP of a wind farm. Provide the standard AEPMultipleWindRoses interfaces, with in addition the
-    possibility to change the layout of the windfarm using wt_positions as an interface.
-    """
-    wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
-
-    def __init__(self, wake_model=TopFGCLarsen()):
-        """
-        :param wake_model: A GenericWindFarm compatible model
-        """
-        super(TopAEP, self).__init__()
-        self.add('wf', wake_model)
-
-
-    def configure(self):
-        """
-        Configure the assembly.
-        :param wake_model: The wake model
-        :return:
-        """
-
-        super(TopAEP, self).configure()
-        self.connect('wt_positions', 'wf.wt_positions')
+#
+# class TopFGCLarsen(FGCLarsen):
+#     """
+#     Calculate the wind turbine power using the GCLarsen model.
+#     This version gives the standard FGCLarsen interfaces, but replace the wt_layout.wt_positions by the input
+#     wt_positions. This is done to speed-up the variable copy in openMDAO. The idea is that at each iteration, it's not
+#     necessary to copy arround wt_layout.
+#     """
+#     wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
+#
+#     def execute(self):
+#         self.wt_layout.wt_positions = self.wt_positions
+#         super(TopFGCLarsen, self).execute()
+#
+# class TopAEP(AEPMultipleWindRoses):
+#     """
+#     Calculate the AEP of a wind farm. Provide the standard AEPMultipleWindRoses interfaces, with in addition the
+#     possibility to change the layout of the windfarm using wt_positions as an interface.
+#     """
+#     wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
+#
+#     def __init__(self, wake_model=TopFGCLarsen()):
+#         """
+#         :param wake_model: A GenericWindFarm compatible model
+#         """
+#         super(TopAEP, self).__init__()
+#         self.add('wf', wake_model)
+#
+#
+#     def configure(self):
+#         """
+#         Configure the assembly.
+#         :param wake_model: The wake model
+#         :return:
+#         """
+#
+#         super(TopAEP, self).configure()
+#         self.connect('wt_positions', 'wf.wt_positions')
 
 
 def weibullCDF(x,A,k):
@@ -94,7 +94,6 @@ def weibullCDF(x,A,k):
     """
     return 1.0 - np.exp(-(x/A)**k)
 
-#@implement_base(BaseAEPModel)
 class AEP(Component):
 
     wf = InterfaceSlot(GenericWindFarm,

@@ -17,7 +17,7 @@
 __all__ = ['Topfarm']
 __author__ = 'Pierre-Elouan Rethore'
 __email__ = "pire@dtu.dk"
-__version__ = '0.01a'
+__version__ = '0.1.0'
 __copyright__ = "Copyright 2015, DTU Wind Energy, TOPFARM Development Team"
 __license__ = "AGPL v3"
 __status__ = "Alpha"
@@ -37,10 +37,10 @@ from fusedwind.plant_flow.vt import GenericWindFarmTurbineLayout
 
 
 # Topfarm lib imports
-from aep import TopAEP
+from aep import AEP
 from layout_distribution import spiral, DistributeSpiral, DistributeXY
 from plot import OffshorePlot
-from lib import ConverHullArea, DistFromTurbines
+from tlib import ConverHullArea, DistFromTurbines
 from foundation import FoundationLength
 from elnet import ElNetLength, elnet
 from optimizers import *
@@ -81,7 +81,7 @@ class Topfarm(Assembly):
         # Load the foundation length calculator
         self.add('foundation', FoundationLength())
         # Load the AEP calculator
-        self.add('aep', TopAEP())
+        self.add('aep', AEP())
 
         # 2.) Adding constraints components ----------------------------------------------------------------------------
         # Load the area constraint calculator

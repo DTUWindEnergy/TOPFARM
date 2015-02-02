@@ -17,7 +17,7 @@ from fusedwind.plant_flow.vt import GenericWindFarmTurbineLayout, WTPC
 
 __author__ = 'Pierre-Elouan Rethore'
 __email__ = "pire@dtu.dk"
-__version__ = '0.01a'
+__version__ = '0.1.0'
 __copyright__ = "Copyright 2015, DTU Wind Energy, TOPFARM Development Team"
 __license__ = "AGPL v3"
 __status__ = "Alpha"

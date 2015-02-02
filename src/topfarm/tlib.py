@@ -16,7 +16,7 @@
 
 __author__ = 'Pierre-Elouan Rethore'
 __email__ = "pire@dtu.dk"
-__version__ = '0.01a'
+__version__ = '0.1.0'
 __copyright__ = "Copyright 2015, DTU Wind Energy, TOPFARM Development Team"
 __license__ = "AGPL v3"
 __status__ = "Alpha"
@@ -86,15 +86,11 @@ def point_in_poly(x,y,poly):
     """
     determine if a point is inside a given polygon or not
 
-    Inputs
-    ------
-    x: [float] x position of the point in [m]
-    y: [float] y position of the point in [m]
-    poly: [ndarray(n,2)] position of the polygon points in [m]
+    :param x: [float] x position of the point in [m]
+    :param y: [float] y position of the point in [m]
+    :param poly: [ndarray(n,2)] position of the polygon points in [m]
 
-    Output
-    -------
-    inside: [bool]
+    :return inside: [bool]
     """
     n = poly.shape[0]
     inside = False
@@ -117,14 +113,10 @@ def dist_from_poly(x,y, poly):
     Calculate the minimum distance from an edge of the polygon. 
     It's positive if the point is inside the polygon, and negative otherwise.
     
-    Inputs
-    ------
-    x, y: floats the position of the point
-    poly: ndarray([n,2]) the points defining the polygon
+    :param x, y: floats the position of the point
+    :param poly: ndarray([n,2]) the points defining the polygon
 
-    Output:
-    -------
-    dist_from_poly: float
+    :return dist_from_poly: float
     """
     if point_in_poly(x,y,poly):
         in_ = 1
@@ -150,15 +142,12 @@ dist = lambda P1, P2: sqrt(l2_dist(P1,P2))
 
 def dist_from_segment(P1, P2, P3):
     """ Calculate the distance of a point P3 from a segment defined by [P1,P2]
-    Inputs
-    ------
-    P1: ndarray([2]) or [2]
-    P2: ndarray([2]) or [2]
-    P3: ndarray([2]) or [2]
 
-    Output:
-    -------
-    dist: float
+    :param P1: ndarray([2]) or [2]
+    :param P2: ndarray([2]) or [2]
+    :param P3: ndarray([2]) or [2]
+
+    :return dist: float
     """
     l2P2P1 = l2_dist(P2,P1) 
     if l2P2P1 == 0:
@@ -179,14 +168,10 @@ def dist_from_segment(P1, P2, P3):
 def wt_dist(wt_positions, diag=None):
     """ Calculate the minimum distance between the wind turbines in a wind farm.
 
-    Input
-    -----
-    wt_positions: ndarray([n_wt, 2]) the x,y positions of the wind turbines
-    diag: float/NaN/inf/None : the value to give the diagonal elements
+    :param wt_positions: ndarray([n_wt, 2]) the x,y positions of the wind turbines
+    :param diag: float/NaN/inf/None : the value to give the diagonal elements
 
-    Output
-    ------
-    min_wt_dist: ndarray([n_wt, n_wt]).
+    :return min_wt_dist: ndarray([n_wt, n_wt]).
     """
     n_wt = wt_positions.shape[0]
     out = array([dist(wt_positions[i,:], wt_positions[j,:]) for i in range(n_wt) for j in range(n_wt)]).reshape([n_wt, n_wt])
@@ -198,13 +183,9 @@ def wt_dist(wt_positions, diag=None):
 def polygon_area(array2d):
     """ Calculate the polygon_area
 
-    Input
-    ------
-    array2d: ndarray(n,2) of ordered point positions
+    :param array2d: ndarray(n,2) of ordered point positions
 
-    Output
-    ------
-    area: float
+    :return area: float
     """
     return 0.5 * abs(sum(x0*y1 - x1*y0 for ((x0, y0), (x1, y1)) in segments(polygon(array2d))))
 

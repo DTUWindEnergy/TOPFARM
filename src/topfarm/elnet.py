@@ -16,7 +16,7 @@
 
 __author__ = 'Pierre-Elouan Rethore'
 __email__ = "pire@dtu.dk"
-__version__ = '0.01a'
+__version__ = '0.1.0'
 __copyright__ = "Copyright 2015, DTU Wind Energy, TOPFARM Development Team"
 __license__ = "AGPL v3"
 __status__ = "Alpha"
@@ -57,13 +57,10 @@ def elnet(positions):
     """
     Calculate the minimum distance grid connection for a given wind farm
 
-    Parameters
-    ----------
-     positions:  ndarray([n_wt,2]): X,Y positions of the wind turbines
+    :param positions: ndarray([n_wt,2])
+                      X,Y positions of the wind turbines
 
-    Returns
-    -------
-     connections: dict of keys (i_wt, j_wt) and value the distance between the two wind turbine index
+    :return: connections: dict of keys (i_wt, j_wt) and value the distance between the two wind turbine index
 
     the total cable length is simply sum(connections.values())
     """
