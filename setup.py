@@ -21,7 +21,7 @@ kwargs = {'author': 'Pierre-Elouan Rethore',
  'package_data': {'topfarm': []},
  'package_dir': {'': 'src'},
  'packages': ['topfarm'],
- 'install_requires': ['numpy', 'scipy', 'pandas', 'matplotlib', 'seaborn','fusedwind','pyopt', 'pyoptdriver'],
+ 'install_requires': ['numpy', 'scipy', 'pandas', 'matplotlib', 'seaborn','fusedwind','pyopt', 'pyopt_driver'],
  'version': '0.1.0',
  'zip_safe': False}
 
