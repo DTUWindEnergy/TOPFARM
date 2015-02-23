@@ -1,6 +1,11 @@
+# Unstable, not running yet....
+
+--------
+
+
 #TOPFARM
 
-TOPFARM is a wind farm optimization tool under development by DTU Wind Energy, based on [FUSED-Wind](http://www.fusedwind.org) and [OpenMDAO](http://www.openmdao.ord).
+TOPFARM is a wind farm optimization tool under development by DTU Wind Energy, based on [FUSED-Wind](http://www.fusedwind.org) and [OpenMDAO](http://www.openmdao.org).
 
 
 ## Dependencies and supported Python versions
@@ -53,19 +58,11 @@ Install [OpenMDAO development v0.10.3](https://github.com/OpenMDAO/OpenMDAO-Fram
 
 Then install [FUSED-Wind](https://github.com/fusedwind/fusedwind) from their repositories
 
-    $ cd ..
-    $ git clone https://github.com/FUSED-Wind/fusedwind.git
-    $ cd fusedwind
-    $ git checkout v0.1.0  
-    $ plugin install
-    $ cd ..
+    $ pip install git+https://github.com/FUSED-Wind/fusedwind.git@v0.1.0
 
 Then run the following commands to download and install TOPFARM
 
-    $ git clone git@github.com:DTUWindEnergy/FUSED-Wake.git
-    $ cd FUSED-Wake
-    $ git checkout 0.1.0
-    $ plugin install
+    $ pip install git+https://github.com/DTUWindEnergy/FUSED-Wake.git@v0.1.0
 
 Install pyOpt and the pyopt driver
 
