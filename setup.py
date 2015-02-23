@@ -4,11 +4,6 @@
 # the distribution.
 #
 from setuptools import setup, find_packages
-from pip.req import parse_requirements
-
-# parse_requirements() returns generator of pip.req.InstallRequirement objects
-install_reqs = parse_requirements('requirements.txt')
-reqs = [str(ir.req) for ir in install_reqs]
 
 kwargs = {'author': 'Pierre-Elouan Rethore',
  'author_email': 'pire@dtu.dk',
@@ -26,7 +21,7 @@ kwargs = {'author': 'Pierre-Elouan Rethore',
  'package_data': {'topfarm': []},
  'package_dir': {'': 'src'},
  'packages': ['topfarm'],
- 'install_requires': reqs,
+ 'install_requires': ['numpy', 'scipy', 'pandas', 'matplotlib', 'seaborn','fusedwind','pyopt', 'pyoptdriver'],
  'version': '0.1.0',
  'zip_safe': False}
 
