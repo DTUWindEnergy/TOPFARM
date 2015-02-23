@@ -4,6 +4,6 @@ scipy
 pandas
 matplotlib
 seaborn
-https://github.com/FUSED-Wind/fusedwind.git@0.1.0#egg=fusedwind
-http://svn.pyopt.org/tags/release-1.1.0#egg=pyopt
-https://github.com/OpenMDAO-Plugins/pyopt_driver.git@0.19#egg=pyoptdriver
+git+http://github.com/FUSED-Wind/fusedwind.git@0.1.0#egg=fusedwind
+svn+http://svn.pyopt.org/tags/release-1.1.0#egg=pyopt
+git+http://github.com/OpenMDAO-Plugins/pyopt_driver.git@0.19#egg=pyoptdriver
