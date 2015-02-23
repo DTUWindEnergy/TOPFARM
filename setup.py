@@ -3,8 +3,12 @@
 # plugin makedist. DO NOT CHANGE IT if you plan to use plugin makedist to update 
 # the distribution.
 #
-
 from setuptools import setup, find_packages
+from pip.req import parse_requirements
+
+# parse_requirements() returns generator of pip.req.InstallRequirement objects
+install_reqs = parse_requirements('requirements.txt')
+reqs = [str(ir.req) for ir in install_reqs]
 
 kwargs = {'author': 'Pierre-Elouan Rethore',
  'author_email': 'pire@dtu.dk',
@@ -22,11 +26,7 @@ kwargs = {'author': 'Pierre-Elouan Rethore',
  'package_data': {'topfarm': []},
  'package_dir': {'': 'src'},
  'packages': ['topfarm'],
- 'install_requires': ['numpy', 'scipy', 'pandas', 'matplotlib', 'seaborn','fusedwind','pyopt', 'pyoptdriver'],
- 'dependency_links': ['https://github.com/FUSED-Wind/fusedwind.git@0.1.0#egg=fusedwind',
-                      'http://svn.pyopt.org/tags/release-1.1.0#egg=pyopt',
-                      'https://github.com/OpenMDAO-Plugins/pyopt_driver.git@0.19#egg=pyoptdriver'],
- 'url': 'https://github.com/DTUWindEnergy/TOPFARM',
+ 'install_requires': reqs,
  'version': '0.1.0',
  'zip_safe': False}
 
