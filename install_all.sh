@@ -1,56 +1,37 @@
 #!/bin/bash
 
-mkdir TOPFARM
-cd TOPFARM
 
-echo 'INSTALL Virtualenv'
-sudo easy_install virtualenv
+if [ ! -x "$(type -p virtualenv)" ]; then
+    echo 'INSTALL Virtualenv'
+    sudo easy_install virtualenv
+fi
 
+echo 'INSTALL own TOPFARM virtual environment'
 virtualenv topfarmv
 . topfarmv/bin/activate
-pip install numpy scipy
+
+pip install pip --upgrade
+pip install numpy
+pip install scipy
 
 echo 'INSTALL OPENMDAO'
+cd topfarmv/src
 git clone https://github.com/OpenMDAO/OpenMDAO-Framework.git
 cd OpenMDAO-Framework
-git checkout 0.10.3
+git checkout 0.10.3.2
 go-openmdao-dev.py
-cd ..
-#
-#echo 'INSTALL FUSED-Wind'
-#git clone https://github.com/FUSED-Wind/fusedwind.git
-#cd fusedwind
-#git checkout v0.1.0
-#plugin install
-#cd ..
-#
-#echo 'INSTALL FUSED-Wake'
-##git clone git@github.com:DTUWindEnergy/FUSED-Wake.git
-##cd FUSED-Wake
-##git checkout 0.1.0
-##plugin install
-##cd ..
-#
-#echo 'INSTALL pyOpt and the pyopt driver'
-#wget http://www.pyopt.org/_downloads/pyOpt-1.2.0.tar.gz
-#tar xvfpz pyOpt-1.2.0.tar.gz
-#cd pyOpt-1.2.0
-#python setup.py install
-#cd ..
-#plugin install pyopt_driver --github
+cd ../..
+
+echo 'INSTALL FUSED-Wind + TOPFARM'
+pip install -r http://raw.githubusercontent.com/DTUWindEnergy/TOPFARM/master/remote_install.txt
+
+echo "Did something go wrong in the installation process? Then post an issue about it on https://github.com/DTUWindEnergy/TOPFARM/issues"
+
+echo FUSED-Wind has been installed in editable mode in $(pwd)/topfarmv/src/fusedwind
+echo FUSED-Wake has been installed in editable mode in $(pwd)/topfarmv/src/fusedwake
+echo TOPFARM has been installed in editable mode in $(pwd)/topfarmv/src/topfarm
+
+echo 'To use TOPFARM you first need to activate the virtual environment:'
+echo '$ . topfarmv/bin/activate'
 
 
-echo 'INSTALL other pre-requisits'
-pip install pandas matplotlib seaborn
-
-plugin install pyopt_driver --github
-
-echo 'INSTALL TOPFARM'
-git clone git@github.com:DTUWindEnergy/TOPFARM.git
-cd TOPFARM
-plugin install
-cd ..
-
-echo 'To activate the virtual environment type:'
-echo '$ . TOPFARM/activate'
-ln -s topfarmv/bin/activate .
