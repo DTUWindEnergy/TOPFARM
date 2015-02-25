@@ -1,7 +1,11 @@
+# to install TOPFARM remotely:
+# pip install -r remote_install.txt
+# FUSED-Wind and TOPFARM will be install in <your_virtual_environment_dir>/src
 pandas
 matplotlib
 seaborn
 -e git+http://github.com/FUSED-Wind/fusedwind.git@0.1.0#egg=fusedwind
 svn+http://svn.pyopt.org/tags/release-1.1.0#egg=pyopt
 git+http://github.com/OpenMDAO-Plugins/pyopt_driver.git@0.19#egg=pyopt_driver
+-e git+http://github.com/DTUWindEnergy/FUSED-Wake.git#egg=fusedwake
 -e git+http://github.com/DTUWindEnergy/TOPFARM.git#egg=topfarm

@@ -15,22 +15,25 @@ TOPFARM depends of on [OpenMDAO v0.10.3](https://github.com/OpenMDAO/OpenMDAO-Fr
  [FUSED-Wake v0.1.0](https://github.com/DTUWindEnergy/FUSED-Wake), pandas, matplotlib, seaborn, [pyopt 1.2](http://pyopt.org)
   and supports python 2.7.x.
 
-## Development installation
 
-### Automatic installation
+# Installation
+
+## Automatic installation
 If you are on Linux of MacOSX, you can try to [download](https://raw.githubusercontent.com/DTUWindEnergy/TOPFARM/master/install_all.sh)
- and run the following script to install everything in a new virtual environment
+ and run the following script to install everything, including OpenMDAO and FUSED-Wind in a new virtual environment
 
     $ wget https://raw.githubusercontent.com/DTUWindEnergy/TOPFARM/master/install_all.sh
     $ chmod +x install_all.sh
     $ ./install_all.sh
 
-### Manual installation
-Create a new topfarm directory
+If you happen to have already OpenMDAO v0.10.3 installed and activated, you can install everything in one command line
 
-    $ mkdir topfarm
-    $ cd topfarm
+    $ pip install -r http://raw.githubusercontent.com/DTUWindEnergy/TOPFARM/master/remote_install.txt
     
+
+## Manual installation
+### [Optional] Create your own TOPFARM virtual environment:
+  
 Install `virtualenv`, if you don't already have it available
  
     $ easy_install virtualenv
@@ -40,49 +43,54 @@ Then create a new virtual environement and activate it
     $ virtualenv topfarmv
     $ . topfarmv/bin/activate
 
-Install the pre-requisits to OpenMDAO (if it doesn't work, make sure that you have your [latest version of pip](http://stackoverflow.com/questions/26575587/cant-install-scipy-through-pip))
+Install the pre-requisits to OpenMDAO (pip probably needs to be upgraded to the latest version).
 
+    $ pip install pip --upgrade 
     $ pip install numpy scipy
+
+### Install OpenMDAO v0.10.3
 
 Install [OpenMDAO development v0.10.3](https://github.com/OpenMDAO/OpenMDAO-Framework/tree/0.10.3).
 
-
     $ git clone https://github.com/OpenMDAO/OpenMDAO-Framework.git
     $ cd OpenMDAO-Framework
-    $ git checkout 0.10.3  
+    $ git checkout 0.10.3.2  
     $ go-openmdao-dev.py
     
 ... coffee break ...
 
     $ cd ..
 
-Then install [FUSED-Wind](https://github.com/fusedwind/fusedwind) from their repositories
-
-    $ pip install git+https://github.com/FUSED-Wind/fusedwind.git@v0.1.0
-
-Then run the following commands to download and install TOPFARM
-
-    $ pip install git+https://github.com/DTUWindEnergy/FUSED-Wake.git@v0.1.0
-
-Install pyOpt and the pyopt driver
-
-    $ wget http://www.pyopt.org/_downloads/pyOpt-1.2.0.tar.gz
-    $ tar xvfpz pyOpt-1.2.0.tar.gz
-    $ cd pyOpt-1.2.0
-    $ python setup.py install
-    $ cd ..
-    $ plugin install pyopt_driver --github
-
-Install other pre-requisits:
-
+### Install FUSED-Wind and TOPFARM plugins and all their dependencies
     $ pip install pandas matplotlib seaborn
+    $ pip install -e git+http://github.com/FUSED-Wind/fusedwind.git@0.1.0#egg=fusedwind
+    $ pip install svn+http://svn.pyopt.org/tags/release-1.1.0#egg=pyopt
+    $ pip install git+http://github.com/OpenMDAO-Plugins/pyopt_driver.git@0.19#egg=pyopt_driver
+    $ pip install -e git+http://github.com/DTUWindEnergy/FUSED-Wake.git#egg=fusedwake    
+    $ pip install -e git+http://github.com/DTUWindEnergy/TOPFARM.git#egg=topfarm
 
+## TOPFARM Developer version
 
-Then run the following commands to download and install TOPFARM
+Note that TOPFARM and FUSED-Wind have been installed in "editable" mode (-e) in the virtual environment source directory
+(`topfarmv/src` or `OpenMDAO-Framework/devenv/src`). Which means that they are actually installed in a 
+cloned directory from their respective github account. From there, you can edit them, commit, push, pull etc..
 
-    $ git clone git@github.com:DTUWindEnergy/TOPFARM.git
-    $ cd TOPFARM
-    $ plugin install
+## Using TOPFARM
+
+Once TOPFARM is installed correctly, you have to activate the corresponding virtual environment before being able to use it.
+If you installed your own virtual environment you have to do:
+
+    $ . topfarmv/bin/activate
+
+If you installed OpenMDAO directly, you have to use the virtual environment provided by OpenMDAO
+
+    $ . OpenMDAO-Framework/devenv/bin/activate
+    
+## Testing TOPFARM installation
+
+You can check if everything is installed correctly by running the tests
+
+    $ 
 
 ## Documentation
 

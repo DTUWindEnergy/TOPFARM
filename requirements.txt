@@ -1,9 +1,13 @@
 # requirements.txt
-numpy
-scipy
+# to install TOPFARM locally:
+# pip install -r requirements.txt
+# FUSED-Wind will be install in <your_virtual_environment_dir>/src
+# TOPFARM will be installed in editable/development mode in the current directory
 pandas
 matplotlib
 seaborn
 -e git+http://github.com/FUSED-Wind/fusedwind.git@0.1.0#egg=fusedwind
 svn+http://svn.pyopt.org/tags/release-1.1.0#egg=pyopt
 git+http://github.com/OpenMDAO-Plugins/pyopt_driver.git@0.19#egg=pyopt_driver
+-e git+http://github.com/DTUWindEnergy/FUSED-Wake.git#egg=fusedwake
+-e .
