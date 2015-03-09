@@ -26,9 +26,10 @@ from openmdao.main.component import Component
 from openmdao.main.datatypes.array import Array
 from openmdao.main.datatypes.float import Float
 from scipy.interpolate.interpnd import LinearNDInterpolator
+from tlib import TopfarmComponent
 
 
-class FoundationLength(Component):
+class FoundationLength(TopfarmComponent):
     wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
     ##wt_layout = VarTree(GenericWindFarmTurbineLayout(), iotype='in', desc='wind turbine properties and layout')
     borders = Array(iotype='in', desc='The polygon defining the borders ndarray([n_bor,2])', unit='m')
@@ -38,11 +39,18 @@ class FoundationLength(Component):
     scaling = Float(1.0, iotype='in', desc='scaling of the foundation')
     inc = 0
 
+
+
     def execute(self):
         foundation_func = LinearNDInterpolator(self.depth[:,0:2],self.depth[:,2])
         self.foundations = array([foundation_func(self.wt_positions[i,0],self.wt_positions[i,1]) for i in range(self.wt_positions.shape[0])])
         #dist = DistFromBorders()(wt_positions=self.wt_positions, borders=self.borders).dist
         min_depth = self.depth[:,2].min()
         self.foundations[isnan(self.foundations)] = min_depth
+
+        if self.scaling == 0.0:
+            # Using the baseline for scaling
+            self.scaling = sum(self.foundations)
+
         self.foundation_length = sum(self.foundations)/self.scaling
         # print 'foundations:', self.foundation_length

@@ -46,7 +46,127 @@ from elnet import ElNetLength, elnet
 from optimizers import *
 
 
+from openmdao.main.api import Assembly
+
+
 class Topfarm(Assembly):
+    def __init__(self, components={}, workflows={}, objectives={}, constraints={}, design_variables={}, connections={}, input_parameters={}):
+        """
+
+        :param components: dict
+        :param workflows: dict
+        :param objectives: dict
+        :param constraints: dict
+        :param design_variables: dict
+        :param connections: list(tuple)
+        :param input_parameters: dict
+        :return:
+        """
+        self._components = components
+        self._workflows = workflows
+        self._objectives = objectives
+        self._constraints = constraints
+        self._design_variables = design_variables
+        self._connections = connections
+        self._input_parameters = input_parameters
+
+        self._output_configure = True
+        self._logconf = []
+        super(Topfarm, self).__init__()
+
+
+
+    def configure(self):
+        self.add_components(self._components)
+        self.add_workflows(self._workflows)
+        self.add_design_variables(self._design_variables)
+        self.add_objectives(self._objectives)
+        self.add_constraints(self._constraints)
+        self.add_connections(self._connections)
+        self.initialise_parameters(self._input_parameters)
+
+        if self._output_configure:
+            self.print_logconf()
+
+
+    def add_components(self, components):
+
+        self.logconf('\n# Add the components')
+        for k, v in components.iteritems():
+            self.add(k,v)
+            self.logconf("self.add('%s', %s)"%(k, v))
+
+    def add_workflows(self, workflows):
+        self.logconf('\n# Add the workflows')
+        for d, w in workflows.iteritems():
+            getattr(self,d).workflow.add(w)
+            self.logconf("self.%s.workflow.add(%s)"%(d, ", ".join(["'%s'"%(i) for i in w])))
+
+    def add_design_variables(self, design_variables):
+        """Get all the design variables automatically from a component that has list_design_variables
+        """
+        self.logconf('\n# Add the design variables')
+        for d, v in design_variables.iteritems():
+            for dv in getattr(self, v).list_design_variables():
+                getattr(self, d).add_parameter(v + '.' + dv['name'],
+                                               start=dv['start'],
+                                               low=dv['low'],
+                                               high=dv['high'],
+                                               fd_step=dv['fd_step'])
+                self.logconf("self.%s.add_parameter('%s', start=%s, low=%s, high=%s, fd_step=%s)"%(
+                        d, v + '.' + dv['name'], dv['start'], dv['low'], dv['high'], dv['fd_step']))
+
+    def add_objectives(self, objectives):
+        self.logconf('\n# Add the objectives')
+        for d, o in objectives.iteritems():
+            getattr(self,d).add_objective(o)
+            self.logconf("self.%s.add_objective('%s')"%(d, o))
+
+    def add_constraints(self, constraints):
+        self.logconf('\n# Add the constraints')
+        for d, cons in constraints.iteritems():
+            for c in cons:
+                print c
+                if '.' in c:
+                    getattr(self, d).add_constraint(c)
+                    self.logconf("self.%s.add_constraint('%s')"%(d, c))
+                else:
+                    # Automatically get the constraints from a the component method list_constraints
+                    for c2 in getattr(self,c).list_constraints():
+                        getattr(self, d).add_constraint(c+'.'+c2)
+                        self.logconf("self.%s.add_constraint('%s')"%(d, c+'.'+c2))
+
+
+    def add_connections(self, connections):
+        self.logconf('\n# Connect the components together')
+        for k, v in connections.iteritems():
+            self.connect(k, v)
+            if isinstance(v, list):
+                self.logconf("self.connect('%s', %s)"%(k, v))
+            else:
+                self.logconf("self.connect('%s', '%s')"%(k, v))
+
+
+    def initialise_parameters(self, parameters):
+        self.logconf('\n# Initialize the input parameters')
+        for v, p in parameters.iteritems():
+            hops = v.split('.')
+            # Travel through the assembly to get the right object
+            obj = self
+            for h in hops[:-1]:
+                if not h == '.' and not h == '':
+                    obj = getattr(obj, h)
+            setattr(obj, hops[-1], p)
+            self.logconf('self.%s = %s'%(v, str(p)))
+
+    def logconf(self, string):
+        self._logconf.append(string)
+
+    def print_logconf(self):
+        print '\n'.join(self._logconf)
+
+
+class TopfarmClassic(Assembly):
     """
     dist_WT_D = Float(3.0, iotype='in', desc='The minimum admissible distance between turbines')
     depth_map = Array(iotype='in', desc='The depth map of the offshore region')

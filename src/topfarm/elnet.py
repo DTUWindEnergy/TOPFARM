@@ -27,10 +27,10 @@ from openmdao.main.component import Component
 from openmdao.main.datatypes.array import Array
 from openmdao.main.datatypes.dict import Dict
 from openmdao.main.datatypes.float import Float
+from tlib import TopfarmComponent
 
 
-
-class ElNetLayout(Component):
+class ElNetLayout(TopfarmComponent):
     wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
     ##wt_layout = VarTree(GenericWindFarmTurbineLayout(), iotype='in', desc='wind turbine properties and layout')
     #elnet_layout = VarTree(GenericWindTurbineCableLayout(), iotype='out')
@@ -40,7 +40,7 @@ class ElNetLayout(Component):
     def execute(self):
         self.elnet_layout = elnet(self.wt_positions)
 
-class ElNetLength(Component):
+class ElNetLength(TopfarmComponent):
     wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
     #wt_layout = VarTree(GenericWindFarmTurbineLayout(), iotype='in', desc='wind turbine properties and layout')
     elnet_layout = Dict(iotype='out') #VarTree(GenericWindTurbineCableLayout(), iotype='out')
@@ -49,6 +49,9 @@ class ElNetLength(Component):
 
     def execute(self):
         elnet_layout = elnet(self.wt_positions)
+        if self.scaling == 0.0:
+            #using the first run as a baseline for scaling:
+            self.scaling = sum(elnet_layout.values())
         self.elnet_length = sum(elnet_layout.values()) / self.scaling
         self.elnet_layout = elnet_layout
 

@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 __author__ = 'Pierre-Elouan Rethore'
 __email__ = "pire@dtu.dk"
 __version__ = '0.1.0'
@@ -27,11 +28,11 @@ import seaborn as sns
 import numpy as np
 from path import path as pa
 from tlib import *
-import matplotlib as plt
+import pylab as plt
 
 from IPython.display import display, clear_output
 
-class OffshorePlot(Component):
+class PrintOutputs(TopfarmComponent):
     wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
     baseline = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
     borders = Array(iotype='in', desc='The polygon defining the borders ndarray([n_bor,2])', unit='m')
@@ -48,13 +49,59 @@ class OffshorePlot(Component):
     elnet_length = Float(iotype='in')
     inc = 0
     fs = 15 #Font size
+
+    def execute(self):
+        dist_min = np.array([self.wt_dist[i] for i in range(self.wt_dist.shape[0]) ]).min()
+        dist_mean = np.array([self.wt_dist[i] for i in range(self.wt_dist.shape[0]) ]).mean()
+
+        if self.inc==0:
+            try:
+                pa(self.result_file+'.results').remove()
+            except:
+                pass
+            self.iterations = [self.inc]
+            self.targvalue = [[self.foundation_length, self.elnet_length, dist_mean, dist_min, self.net_aep]]
+        else:
+            self.iterations.append(self.inc)
+            self.targvalue.append([self.foundation_length, self.elnet_length, dist_mean, dist_min, self.net_aep])
+        self.targname = ['Foundation length', 'El net length', 'Mean WT Dist', 'Min WT Dist', 'AEP']
+
+        targarr = np.array(self.targvalue)
+        output =  '%d:'%(self.inc) + ', '.join(['%s=%6.2f'%(self.targname[i], targarr[-1,i]) for i in range(len(self.targname))]) + '\n' # + str(self.wt_positions)
+        print output
+        with open(self.result_file+'.results','a') as f:
+            f.write(output)
+
+        self.inc += 1
+
+
+class OffshorePlot(TopfarmComponent):
+    wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
+    baseline = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
+    borders = Array(iotype='in', desc='The polygon defining the borders ndarray([n_bor,2])', unit='m')
+    depth = Array(iotype='in', desc='An array of depth ndarray([n_d, 2])', unit='m')
+    foundations = Array(iotype='in', desc='The foundation length ofeach wind turbine')
+    #wt_dist = Array(iotype='in', desc="""The distance between each turbines ndarray([n_wt, n_wt]).""", unit='m')
+    spiral_param = Float(5.0, iotype='in', desc='spiral parameter')
+    png_name = Str('wind_farm', iotype='in', desc='The base of the png name used to save the fig')
+    result_file = Str('wind_farm', iotype='in', desc='The base result name used to save the fig')
+    distribution = Str('spiral', iotype='in', desc='The type of distribution to plot')
+    elnet_layout = Dict(iotype='in')
+    inc = 0
+    fs = 15 #Font size
     
-    def __init__(self):
-        super(OffshorePlot, self).__init__()
-        self.fig = plt.figure(num=None, figsize=(7, 4), dpi=200, facecolor='w', edgecolor='k')
+    def __init__(self, add_inputs, title='', **kwargs):
+        super(OffshorePlot, self).__init__(**kwargs)
+        self.fig = plt.figure(num=None, figsize=(13, 8), dpi=1000, facecolor='w', edgecolor='k')
         self.shape_plot = self.fig.add_subplot(121)
         self.objf_plot = self.fig.add_subplot(122)
 
+        self.targname = add_inputs
+        self.title = title
+
+        # Adding automatically the inputs
+        for i in add_inputs:
+            self.add(i, Float(0.0, iotype='in'))
 
         #sns.set(style="darkgrid")
         #self.pal = sns.dark_palette("skyblue", as_cmap=True)
@@ -66,19 +113,17 @@ class OffshorePlot(Component):
 
     def execute(self):
         plt.ion()     
-        dist_min = np.array([self.wt_dist[i] for i in range(self.wt_dist.shape[0]) ]).min()
-        dist_mean = np.array([self.wt_dist[i] for i in range(self.wt_dist.shape[0]) ]).mean()
         if self.inc==0:
             try:
                 pa(self.result_file+'.results').remove()
             except:
                 pass
             self.iterations = [self.inc]
-            self.targvalue = [[self.foundation_length, self.elnet_length, dist_mean, dist_min, self.net_aep]]
+            self.targvalue = [[getattr(self, i) for i in self.targname]]
             self.pre_plot()
         else:
             self.iterations.append(self.inc)
-            self.targvalue.append([self.foundation_length, self.elnet_length, dist_mean, dist_min, self.net_aep])
+            self.targvalue.append([getattr(self, i) for i in self.targname])
             #print self.iterations,self.targvalue
         #if self.inc % (2*self.wt_positions.shape[0]) == 0:
         #self.refresh()
@@ -98,7 +143,6 @@ class OffshorePlot(Component):
 
         Zin = points_in_poly(self.X,self.Y, self.borders)
         self.Z.mask = Zin.__neg__()
-        self.targname = ['Foundation length', 'El net length', 'Mean WT Dist', 'Min WT Dist', 'AEP']
         #Z.mask = False
         #Z.data[Zin.__neg__()] = -20.0
 
@@ -115,7 +159,7 @@ class OffshorePlot(Component):
             spiral = lambda t_, a_, x_: [a_*t_**(1./x_) * np.cos(t_), a_*t_**(1./x_) * np.sin(t_)]
             spirals = lambda ts_, a_, x_: np.array([spiral(t_, a_, x_) for t_ in ts_])
             for P in self.baseline:
-                Plot(P + spirals(plt.linspace(0.,10*np.pi,1000), self.spiral_param, 1.), 'w-', linewidth=0.1)
+                Plot(P + spirals(plt.linspace(0.,10*np.pi,1000), self.spiral_param, 1.), 'g-', linewidth=0.1)
 
 
         self.shape_plot.plot(self.borders[:,0], self.borders[:,1],'k-')
@@ -130,7 +174,7 @@ class OffshorePlot(Component):
         for i in range(targarr.shape[1]):
             self.posb.append(self.objf_plot.plot(self.iterations, self.targvalue[0][i],'.', label=self.targname[i]))
         print 'posb', self.posb
-        self.objf_plot.legend(loc=3)
+        self.legend = self.objf_plot.legend(loc=3,  bbox_to_anchor=(1.1, 0.0))
 
         plt.title('Foundation = %8.2f'%(self.foundation_length))
         plt.draw()
@@ -147,17 +191,18 @@ class OffshorePlot(Component):
         for i in range(len(self.posb)):
             self.posb[i][0].set_xdata(self.iterations)
             self.posb[i][0].set_ydata(targarr[:,i])
+            self.legend.texts[i].set_text('%s = %8.2f'%(self.targname[i], targarr[-1,i]))
         self.objf_plot.set_xlim([0, self.iterations[-1]])
         self.objf_plot.set_ylim([0.5, 1.2])
-        plt.title('Foundation = %8.2f'%(self.foundation_length))
+        if not self.title == '':
+            plt.title('%s = %8.2f'%(self.title, getattr(self, self.title)))
         plt.draw()
         #print self.iterations[-1] , ': ' + ', '.join(['%s=%6.2f'%(self.targname[i], targarr[-1,i]) for i in range(len(self.targname))])
         with open(self.result_file+'.results','a') as f:
             f.write( '%d:'%(self.inc) + ', '.join(['%s=%6.2f'%(self.targname[i], targarr[-1,i]) for i in range(len(self.targname))]) + 
-                str(self.wt_positions) + '\n'
-                )
+                '\n')
         #plt.show()
-        plt.savefig(filename)
+        #plt.savefig(filename)
         display(plt.gcf())
         #plt.show()
         clear_output(wait=True)

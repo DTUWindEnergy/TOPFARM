@@ -59,7 +59,7 @@ dak_all = grad_opt + pattern_opt + pattern_opt + simplex + greedy + ea + direct
 
 # OpenMDAO optimizers --------------------------------------------------------------------------------------------------
 class CONMINOpt(CONMINdriver):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(CONMINOpt, self).__init__()
         # CONMIN-specific Settings
         self.itmax = 30
@@ -68,34 +68,55 @@ class CONMINOpt(CONMINdriver):
         self.ctlmin = 0.01
         self.delfun = 0.001
 
+        # Initialise the inputs
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
+
 class NEWSUMTOpt(NEWSUMTdriver):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(NEWSUMTOpt, self).__init__()
         # NEWSUMT-specific Settings
         self.itmax = 1000
 
+        # Initialise the inputs
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
+
 class COBYLAOpt(COBYLAdriver):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(COBYLAOpt, self).__init__()
         # COBYLA-specific Settings
         self.rhobeg = 1.0
         self.rhoend = 1.0e-4
         self.maxfun = 10000
 
+        # Initialise the inputs
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
+
 class SLSQPOpt(SLSQPdriver):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(SLSQPOpt, self).__init__()
         # SLSQP-specific Settings
         self.accuracy = 1.0e-6
         self.maxiter = 1000
 
+        # Initialise the inputs
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
+
 class GeneticOpt(Genetic):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(GeneticOpt, self).__init__()
         # Genetic-specific Settings
         self.population_size = 90
         self.crossover_rate = 0.9
         self.mutation_rate = 0.02
+
+        # Initialise the inputs
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
+
         # self.parent.selection_method = 'rank'
 
         # self.add('driver', CONMINdriver())
@@ -140,7 +161,7 @@ class GeneticOpt(Genetic):
 
 # PyOPT ----------------------------------------------------------------------------------------------------------------
 #pyopt_methods = ['ALHSO', 'ALPSO', 'COBYLA', 'CONMIN',   'KSOPT', 'NSGA2', 'SLSQP'] 
-pyopt_methods = ['ALHSO', 'ALPSO', 'COBYLA', 'CONMIN', 'GCMMA', 'MIDACO', 'MMFD', 'NSGA2', 'SLSQP', 'SOLVOPT']
+pyopt_methods = ['ALHSO', 'ALPSO', 'COBYLA', 'CONMIN', 'KSOPT', 'MIDACO', 'NSGA2', 'PSQP', 'SLSQP', 'SOLVOPT']
 # Not working..
 #'FSQP','GCMMA', 'MIDACO', 'MMA', 'MMFD', 'NLPQL', 'PSQP', 'SNOPT',  'SOLVOPT'
 
@@ -237,16 +258,16 @@ class PyoptOpt(pyOptDriver):
 
 
 # DTU GTO --------------------------------------------------------------------------------------------------------------
-from gto_wrapper.gto_wrapper import GTOWrapper
+#from gto_wrapper.gto_wrapper import GTOWrapper
 
-class GTOpt(GTOWrapper):
-    def __init__(self, method=2):
-        self.alg_type = method
-        super(GTOpt, self).__init__()
-        self.hawtoptbin = 'HAWTOPT'
-        self.alg_maxit=50
-        self.SLP_ml=4.
-        #self.fd_step_default=0.001
+#class GTOpt(GTOWrapper):
+#    def __init__(self, method=2):
+#        self.alg_type = method
+#        super(GTOpt, self).__init__()
+#        self.hawtoptbin = 'HAWTOPT'
+#        self.alg_maxit=50
+#        self.SLP_ml=4.
+#        #self.fd_step_default=0.001
 
 
 # Generate all the available optimizers --------------------------------------------------------------------------------
@@ -261,8 +282,8 @@ def opti_generator():
     for i in pyopt_methods:
         yield PyoptOpt(i)
         
-    for i in range(1,4):
-        yield GTOpt(i)
+#    for i in range(1,4):
+#        yield GTOpt(i)
         
 ### Create a list of optimizers for benchmarking
 optilist = list(opti_generator())

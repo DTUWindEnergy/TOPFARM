@@ -27,33 +27,96 @@ from numpy import sqrt, argmin, array, zeros, isnan, meshgrid, linspace
 from scipy.interpolate import RectBivariateSpline, LinearNDInterpolator
 from scipy.spatial import ConvexHull
 from matplotlib.pyplot import plot
-
-
 import numpy as np
+import pandas as pd
 
-class ConverHullArea(Component):
+
+#
+def listcase2df(cases):
+    """
+    Transform the cases of a ListCaseRecorder into a pandas dataframe
+    :param cases: list(Case)
+                  The list of cases accessible in ListRecorder().cases
+    :return: pandas.DataFrame
+
+    Example
+    -------
+    >  df = listcase2df(analysis.recorders[1])
+    """
+    return pd.DataFrame([dict(case.items()) for case in cases.cases])
+
+def casedataset2df(cds):
+    """
+    Transform a CaseDataset instance into a panda DataFrame instance
+    :param cds: CaseDataset instance
+    :return: pandas.DataFrame
+
+    Example
+    -------
+    >  df1 = casedataset2df(CaseDataset('doe.json', 'json'))
+    """
+
+    return pd.DataFrame(np.array(cds.data.fetch()), columns=cds.data.var_names().fetch())
+
+
+
+class TopfarmComponent(Component):
+    def __init__(self, **kwargs):
+        super(TopfarmComponent, self).__init__()
+
+        # Initialise the inputs passed as parameters to the __init__ method
+        for k,v in kwargs.iteritems():
+            if k in self.list_inputs():
+                setattr(self, k, v)
+
+
+class ConverHullArea(TopfarmComponent):
     wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
-    #wt_layout = VarTree(GenericWindFarmTurbineLayout(), iotype='in', desc='wind turbine properties and layout') 
     area = Float(iotype='out', desc='The convex hull area around the wind farm', unit='m*m')
+    scaling = Float(1.0, iotype='in', desc='scaling of the dist')
 
     def execute(self):
         ch = ConvexHull(self.wt_positions)
         area = polygon_area(self.wt_positions[ch.vertices,:])
 
-class DistFromBorders(Component):
+        if self.scaling == 0.0:
+            self.scaling = area
+
+        self.area = area / self.scaling
+
+
+class DistFromBorders(TopfarmComponent):
     wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
-    #wt_layout = VarTree(GenericWindFarmTurbineLayout(), iotype='in', desc='wind turbine properties and layout') 
     borders = Array(iotype='in', desc='The polygon defining the borders ndarray([n_bor,2])', unit='m')
-    dist = Array(iotype='out', desc="""The distance of each turbine to the borders ndarray([n_wt, n_bor]). 
+    dist = Array(iotype='out', desc="""The distance of each turbine to the borders ndarray([n_wt, n_bor]).
                                        Positive if inside, negative if outside""", unit='m')
     scaling = Float(1.0, iotype='in', desc='scaling of the dist')
 
+    def __init__(self, wt_layout, **kwargs):
+        super(DistFromBorders, self).__init__(**kwargs)
+        self.wt_layout = wt_layout
+        self.wt_positions = wt_layout.wt_positions
+        self.const_names = []
+        for wt_name in self.wt_layout.wt_names:
+            self.const_names.append(wt_name + '_border')
+            self.add(self.const_names[-1], Float(0.0, iotype='out'))
+
+    def list_constraints(self):
+        return [const_name + '>0.0' for const_name in self.const_names]
+
     def execute(self):
-        self.dist = array([dist_from_poly(x,y, self.borders) for x, y in self.wt_positions])/self.scaling
+        if self.scaling == 0.0:
+            #using the border as a scaling
+            self.scaling = np.sqrt((self.borders[:,0].max()-self.borders[:,0].min())**2. +
+                                   (self.borders[:,1].max()-self.borders[:,1].min())**2.)
+        self.dist = array([dist_from_poly(x,y, self.borders).min() for x, y in self.wt_positions])/self.scaling
+        for i, const_name in enumerate(self.const_names):
+            setattr(self, const_name, self.dist[i])
         # print 'borders',min(self.dist.flatten())
 
 
-class DistFromTurbines(Component):
+
+class DistFromTurbines(TopfarmComponent):
     wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
     #wt_layout = VarTree(GenericWindFarmTurbineLayout(), iotype='in', desc='wind turbine properties and layout') 
     threshold = Float(iotype='in', desc='The threshold value the wind turbines should not be under', unit='m')
@@ -65,16 +128,33 @@ class DistFromTurbines(Component):
     def execute(self):
         n_wt = self.wt_positions.shape[0]
         if n_wt>0:
-            dist = wt_dist(self.wt_positions, diag=100000.) / self.scaling
-            self.dist = np.array([dist[i,:].min() for i in range(n_wt)])
+
+            dist = wt_dist(self.wt_positions, diag=100000.)
             #print self.dist
 
             non_diag = np.array([dist[i,range(i)+range(i+1,n_wt)].min() for i in range(n_wt)])
-            self.min_dist = non_diag.min()
+            if self.scaling == 0.0:
+                self.scaling = non_diag.min()
+
+            self.dist = np.array([dist[i,:].min() for i in range(n_wt)]) / self.scaling
+            self.min_dist = non_diag.min() / self.scaling
+            self.mean_dist = non_diag.mean() / self.scaling
+
         else:
             self.min_dist = 0.
             self.mean_dist = 0.
             self.dist = array([])
+
+def document(cls):
+    """Convenient function to document the I/Os of an openmdao class"""
+    obj = cls()
+    print 'INPUTS:\n-------'
+    for var in obj.list_inputs():
+        print var, '=', str(getattr(obj,var)), '\n\t', obj.__base_traits__[var].desc
+
+    print '\nOUTPUTS:\n--------'
+    for var in obj.list_outputs():
+        print var, '=', str(getattr(obj,var)), '\n\t', obj.__base_traits__[var].desc
 
 
 
