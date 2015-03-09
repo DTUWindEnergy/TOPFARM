@@ -35,7 +35,15 @@ If you happen to have already OpenMDAO v0.10.3 installed and activated, you can 
     $ pip install -r http://raw.githubusercontent.com/DTUWindEnergy/TOPFARM/master/remote_install.txt
     
 
+
 ## Manual installation
+
+### Windows installation
+Follow the instructions from [OpenMDAO website](http://openmdao.org/docs/getting-started/requirements.html) to install OpenMDAO 0.10.3.2. Then activate the OpenMDAO virtual environment.
+
+    $ pip install -r http://raw.githubusercontent.com/DTUWindEnergy/TOPFARM/master/remote_install.txt
+
+
 ### [Optional] Create your own TOPFARM virtual environment:
   
 Install `virtualenv`, if you don't already have it available
