@@ -25,7 +25,7 @@ from openmdao.main.api import Component, Assembly
 from openmdao.lib.datatypes.api import VarTree, Float, Slot, Array, List, Int, Str, Dict
 from numpy import sqrt, argmin, array, zeros, isnan, meshgrid, linspace
 from scipy.interpolate import RectBivariateSpline, LinearNDInterpolator
-from scipy.spatial import ConvexHull
+#from scipy.spatial import ConvexHull
 from matplotlib.pyplot import plot
 import numpy as np
 import pandas as pd
@@ -70,19 +70,19 @@ class TopfarmComponent(Component):
                 setattr(self, k, v)
 
 
-class ConverHullArea(TopfarmComponent):
-    wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
-    area = Float(iotype='out', desc='The convex hull area around the wind farm', unit='m*m')
-    scaling = Float(1.0, iotype='in', desc='scaling of the dist')
+# class ConverHullArea(TopfarmComponent):
+#     wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
+#     area = Float(iotype='out', desc='The convex hull area around the wind farm', unit='m*m')
+#     scaling = Float(1.0, iotype='in', desc='scaling of the dist')
 
-    def execute(self):
-        ch = ConvexHull(self.wt_positions)
-        area = polygon_area(self.wt_positions[ch.vertices,:])
+#     def execute(self):
+#         ch = ConvexHull(self.wt_positions)
+#         area = polygon_area(self.wt_positions[ch.vertices,:])
 
-        if self.scaling == 0.0:
-            self.scaling = area
+#         if self.scaling == 0.0:
+#             self.scaling = area
 
-        self.area = area / self.scaling
+#         self.area = area / self.scaling
 
 
 class DistFromBorders(TopfarmComponent):
@@ -118,7 +118,7 @@ class DistFromBorders(TopfarmComponent):
 
 class DistFromTurbines(TopfarmComponent):
     wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
-    #wt_layout = VarTree(GenericWindFarmTurbineLayout(), iotype='in', desc='wind turbine properties and layout') 
+    #wt_layout = VarTree(GenericWindFarmTurbineLayout(), iotype='in', desc='wind turbine properties and layout')
     threshold = Float(iotype='in', desc='The threshold value the wind turbines should not be under', unit='m')
     dist = Array(iotype='out', desc="""The distance between each turbines ndarray([n_wt]).""", unit='m')
     scaling = Float(1.0, iotype='in', desc='')
@@ -185,14 +185,14 @@ def point_in_poly(x,y,poly):
                 inside = not inside
         p1x,p1y = p2x,p2y
 
-    return inside    
+    return inside
 
 
 def dist_from_poly(x,y, poly):
     """
-    Calculate the minimum distance from an edge of the polygon. 
+    Calculate the minimum distance from an edge of the polygon.
     It's positive if the point is inside the polygon, and negative otherwise.
-    
+
     :param x, y: floats the position of the point
     :param poly: ndarray([n,2]) the points defining the polygon
 
@@ -229,7 +229,7 @@ def dist_from_segment(P1, P2, P3):
 
     :return dist: float
     """
-    l2P2P1 = l2_dist(P2,P1) 
+    l2P2P1 = l2_dist(P2,P1)
     if l2P2P1 == 0:
         return dist(P1,P3)
     x1, y1 = P1
@@ -238,13 +238,13 @@ def dist_from_segment(P1, P2, P3):
     u = ((x3-x1)*(x2-x1) + (y3-y1)*(y2-y1)) / l2P2P1
     x = x1 + u*(x2-x1)
     y = y1 + u*(y2-y1)
-    if u > 1.0: 
+    if u > 1.0:
         x, y = P2
     if u < 0.0:
         x, y = P1
     #plot([x3, x],[y3, y],'k--')
     return dist([x,y], P3)
-    
+
 def wt_dist(wt_positions, diag=None):
     """ Calculate the minimum distance between the wind turbines in a wind farm.
 
@@ -257,7 +257,7 @@ def wt_dist(wt_positions, diag=None):
     out = array([dist(wt_positions[i,:], wt_positions[j,:]) for i in range(n_wt) for j in range(n_wt)]).reshape([n_wt, n_wt])
     if diag:
         for i in range(n_wt):
-            out[i,i] = diag 
+            out[i,i] = diag
     return out
 
 def polygon_area(array2d):
@@ -284,7 +284,7 @@ class PolyFill(object):
     """
 
     max_step = 3
-    
+
     def __init__(self, polygon, dx, dy):
         """
         Init the object, and fill the domain with points
@@ -298,7 +298,7 @@ class PolyFill(object):
         self.dy = dy
         self.init_values()
         self.fill()
-        
+
     def init_values(self):
         """
         Initialise the basic information about the domain
@@ -306,12 +306,12 @@ class PolyFill(object):
         self.x_min = self.polygon[:,0].min()
         self.x_max = self.polygon[:,0].max()
         self.y_min = self.polygon[:,1].min()
-        self.y_max = self.polygon[:,1].max()        
+        self.y_max = self.polygon[:,1].max()
         self.lx = self.x_max - self.x_min
         self.ly = self.y_max - self.y_min
         self.nx = int(np.ceil(self.lx / self.dx))
         self.ny = int(np.ceil(self.ly / self.dy))
-    
+
     def fill(self):
         """
         Fill the domain with points
@@ -321,7 +321,7 @@ class PolyFill(object):
         self.X, self.Y = np.meshgrid(self.xs, self.ys)
         self.positions = np.array([[x,y] for x,y in zip(self.X.flatten(), self.Y.flatten())])
         self.In = np.array([points_in_poly(x,y,self.polygon) for x,y in zip(self.X.flatten(), self.Y.flatten())]).reshape(self.X.shape)
-        
+
     def plot(self):
         plot(self.polygon[:,0], self.polygon[:,1], '--')
         plot(self.X[self.In].flatten(), self.Y[self.In].flatten(), 'k.')
@@ -346,7 +346,7 @@ class PolyFill(object):
                  is the point inside the polygon?
         """
         return point_in_poly(P[0], P[1], self.polygon)
-    
+
     def is_in_id(self, i,j):
         """
         Inform if the indices are inside the acceptable domain
@@ -356,7 +356,7 @@ class PolyFill(object):
         :return: boolean
         """
         return self.In[i,j]
-    
+
     def locate_ij(self, P):
         """
         Find the closest control point to the reference point P
@@ -367,8 +367,8 @@ class PolyFill(object):
                  indices in self.positions
         """
         a = np.argmin([(x-P[0])**2 + (y-P[1])**2 for x,y in self.positions])
-        return int(np.ceil(a/self.nx)), a % self.nx   
-    
+        return int(np.ceil(a/self.nx)), a % self.nx
+
     def locate_xy(self, i, j):
         """
         Returns the corresponding point to the indices i,j
@@ -378,7 +378,7 @@ class PolyFill(object):
         :return: array[2]
         """
         return array([self.X[i,j], self.Y[i,j]])
-    
+
     def move(self, P0, P1):
         """
         Move a point P0 to a new legal location
@@ -403,7 +403,7 @@ class PolyFill(object):
             P2 = self.locate_xy(i1, j1) + P_off
 
             return P2
-            
+
     def valid_move(self, i0, j0, x_steps, y_steps, P_off):
         """
         Function that move one index location to another according to an offset P_off
@@ -425,7 +425,7 @@ class PolyFill(object):
             ## Making sure we get somewhere
             self.loop_i = 0
             return self.valid_move(i0, j0, x_steps+1, max(y_steps,1), P_off)
-            
+
         i1 = (i0 + y_steps) % self.ny
         j1 = (j0 + x_steps) % self.nx
 
