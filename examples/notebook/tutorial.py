@@ -45,7 +45,8 @@ from fusedwind.plant_flow.vt import GenericWindFarmTurbineLayout, WTPC, WeibullW
 from topfarm.aep import AEP
 from topfarm.layout_distribution import spiral, DistributeSpiral, DistributeXY, DistributeFilledPolygon
 from topfarm.plot import OffshorePlot, PrintOutputs
-from topfarm.tlib import ConverHullArea, DistFromTurbines, PolyFill, document, DistFromBorders
+from topfarm.tlib import DistFromTurbines, PolyFill, document, DistFromBorders
+#from topfarm.tlib import ConverHullArea,
 from topfarm.foundation import FoundationLength
 from topfarm.elnet import ElNetLength, elnet
 from topfarm.optimizers import *
@@ -254,15 +255,15 @@ components = {
                wind_speeds=[4, 8, 12],
                wind_directions=linspace(0, 360, 12)[:-1],
                scaling=0.0),
-    'area': ConverHullArea(wt_layout=wt_layout, scaling=0.0),
+#    'area': ConverHullArea(wt_layout=wt_layout, scaling=0.0),
     'dist_from_borders': DistFromBorders(wt_layout=wt_layout, borders=borders, scaling=0.0),
     'wt_dist': DistFromTurbines(scaling=wt_desc.rotor_diameter * dist_WT_D),
     'distribute': DistributeFilledPolygon(wt_layout=wt_layout, borders=borders),
     'plotting': OffshorePlot(baseline=baseline, borders=borders, depth=depth, distribution='xy',
-                             add_inputs=['area', 'capacity_factor', 'elnet_length', 'net_aep', 'foundation_length', 'min_dist' ],
+                             add_inputs=['capacity_factor', 'elnet_length', 'net_aep', 'foundation_length', 'min_dist' ],
                              title='capacity_factor'),
     'driver': COBYLAOpt(rhobeg=1e-2)}
-workflows =   {'driver': ['distribute', 'foundation', 'elnet', 'aep', 'area', 'dist_from_borders', 'wt_dist', 'plotting']}
+workflows =   {'driver': ['distribute', 'foundation', 'elnet', 'aep', 'dist_from_borders', 'wt_dist', 'plotting']}
 
 objectives =  {'driver': '-aep.net_aep'}
 # objectives =  {'driver': '-aep.net_aep + 0.4*elnet.elnet_length'}
@@ -282,16 +283,14 @@ connections = {'distribute.wt_positions': ['foundation.wt_positions',
                                             'wt_dist.wt_positions',
                                             'aep.wt_positions',
                                             'plotting.wt_positions',
-                                           'dist_from_borders.wt_positions',
-                                           'area.wt_positions'],
+                                           'dist_from_borders.wt_positions'],
                'foundation.foundation_length': 'plotting.foundation_length',
                'foundation.foundations': 'plotting.foundations',
                'elnet.elnet_layout': 'plotting.elnet_layout',
                'elnet.elnet_length': 'plotting.elnet_length',
                'wt_dist.min_dist': 'plotting.min_dist',
                'aep.capacity_factor': 'plotting.capacity_factor',
-               'aep.net_aep': 'plotting.net_aep',
-               'area.area': 'plotting.area'}
+               'aep.net_aep': 'plotting.net_aep'}
 
 input_parameters = {}
 top = Topfarm(components, workflows, objectives, constraints, design_variables, connections, input_parameters)

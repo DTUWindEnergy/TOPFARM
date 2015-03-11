@@ -40,7 +40,8 @@ from fusedwind.plant_flow.vt import GenericWindFarmTurbineLayout
 from aep import AEP
 from layout_distribution import spiral, DistributeSpiral, DistributeXY
 from plot import OffshorePlot
-from tlib import ConverHullArea, DistFromTurbines
+from tlib import DistFromTurbines
+#from tlib import ConverHullArea,
 from foundation import FoundationLength
 from elnet import ElNetLength, elnet
 #from optimizers import *
@@ -205,7 +206,7 @@ class TopfarmClassic(Assembly):
 
         # 2.) Adding constraints components ----------------------------------------------------------------------------
         # Load the area constraint calculator
-        self.add('area', ConverHullArea())
+        #self.add('area', ConverHullArea())
         # Load the wind turbine distance calculator
         self.add('wt_dist', DistFromTurbines())
         # self.add('border_dist', DistFromBorders())
