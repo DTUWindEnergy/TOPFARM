@@ -48,7 +48,7 @@ from topfarm.plot import OffshorePlot, PrintOutputs
 from topfarm.tlib import ConverHullArea, DistFromTurbines, PolyFill, document, DistFromBorders
 from topfarm.foundation import FoundationLength
 from topfarm.elnet import ElNetLength, elnet
-from topfarm.optimizers import *
+#from topfarm.optimizers import *
 from topfarm.topfarm import Topfarm
 
 #GCL imports
@@ -66,14 +66,13 @@ import pylab as plt
 
 # In[3]:
 
-datadir = '/Users/pire/git/FUSED-TOPFARM/src/topfarm/test/data/'
-dat = loadtxt(datadir+'WaterDepth1.dat')
+dat = loadtxt('WaterDepth1.dat')
 X, Y = meshgrid(linspace(0., 1000., 50), linspace(0., 1000., 50))
 depth = array(zip(X.flatten(), Y.flatten(), dat.flatten()))
 borders = array([[200, 200], [150, 500], [200, 800], [600, 900], [700, 700], [900, 500], [800, 200], [500, 100], [200, 200]])
 baseline = array([[587.5, 223.07692308], [525., 346.15384615], [837.5, 530.76923077], [525., 530.76923077], [525., 838.46153846], [837.5, 469.23076923]])
 
-wt_desc = WTDescFromWTG(datadir+'V80-2MW-offshore.wtg').wt_desc
+wt_desc = WTDescFromWTG('V80-2MW-offshore.wtg').wt_desc
 wt_layout = GenericWindFarmTurbineLayout([WTPC(wt_desc=wt_desc, position=pos) for pos in baseline])
 
 
@@ -114,13 +113,13 @@ plt.rcParams['axes.titleweight'] = 'bold'
 plt.rcParams['axes.titlesize'] = 14
 # To see all the options:
 #plt.rcParams.keys()
-
+plt.show()
 
 # In[7]:
 
 
 N = 100
-X, Y = plt.meshgrid(plt.linspace(depth[:,0].min(), depth[:,0].max(), N), 
+X, Y = plt.meshgrid(plt.linspace(depth[:,0].min(), depth[:,0].max(), N),
                     plt.linspace(depth[:,1].min(), depth[:,1].max(), N))
 Z = plt.griddata(depth[:,0],depth[:,1],depth[:,2],X,Y, interp='linear')
 
@@ -131,12 +130,12 @@ plt.contourf(X,Y,Z, label='depth [m]')
 #ax.plot(wt_layout.wt_positions[:,0], wt_layout.wt_positions[:,1], 'or', label='baseline position')
 ax.scatter(wt_layout.wt_positions[:,0], wt_layout.wt_positions[:,1], wt_layout._wt_list('rotor_diameter'), label='baseline position')
 ax.plot(borders[:,0], borders[:,1], 'r--', label='border')
-ax.set_xlabel('x [m]'); 
+ax.set_xlabel('x [m]');
 ax.set_ylabel('y [m]')
 ax.axis('equal');
 ax.legend(loc='lower left')
 plt.colorbar().set_label('water depth [m]')
-
+plt.show()
 
 # The red points indicate the position of the baseline turbines, the contour plot illustrate the water depth in meters and the red line illustrates the position of the borders limiting the domain of exploration of the optimization.
 
@@ -147,7 +146,7 @@ plt.colorbar().set_label('water depth [m]')
 class A(object):
     def run(self,a):
         return a/0.0
-        
+
 a = A()
 
 a.run(1)
@@ -160,7 +159,7 @@ fig = plt.figure(figsize=(12,5), dpi=1000)
 # Plotting the wind statistics
 ax1 = plt.subplot(121, polar=True)
 w = 2.*np.pi/len(wind_rose.frequency)
-b = ax1.bar(pi/2.0-np.array(wind_rose.wind_directions)/180.*np.pi - w/2.0, 
+b = ax1.bar(pi/2.0-np.array(wind_rose.wind_directions)/180.*np.pi - w/2.0,
             np.array(wind_rose.frequency)*100, width=w)
 
 # Trick to set the right axes (by default it's not oriented as we are used to in the WE community)
@@ -170,11 +169,11 @@ ax1.set_title('Wind direction frequency');
 
 # Plotting the Weibull A parameter
 ax2 = plt.subplot(122, polar=True)
-b = ax2.bar(pi/2.0-np.array(wind_rose.wind_directions)/180.*np.pi - w/2.0, 
+b = ax2.bar(pi/2.0-np.array(wind_rose.wind_directions)/180.*np.pi - w/2.0,
             np.array(wind_rose.A), width=w)
 ax2.set_xticklabels([u'%d\xb0'%(mirror(d)) for d in linspace(0.0, 360.0,9)[:-1]]);
 ax2.set_title('Weibull A parameter per wind direction sectors');
-
+plt.show()
 
 # ### Setting up TOPFARM
 
@@ -188,8 +187,8 @@ wd = linspace(0, 360, 37)[:-1]
 
 # In[11]:
 
-aep = AEP(wt_layout=wt_layout, 
-          wind_rose=wind_rose, 
+aep = AEP(wt_layout=wt_layout,
+          wind_rose=wind_rose,
           wf=FGCLarsen(),
           wind_speeds=ws,
           wind_directions=wd,
@@ -217,7 +216,7 @@ components = {
     'elnet': ElNetLength(scaling=0.0),
     'wt_dist': DistFromTurbines(scaling=wt_desc.rotor_diameter * dist_WT_D),
     'dist_from_borders': DistFromBorders(wt_layout=wt_layout, borders=borders, scaling=0.0),
-    'plotting': OffshorePlot(baseline=baseline, borders=borders, depth=depth, distribution='xy', 
+    'plotting': OffshorePlot(baseline=baseline, borders=borders, depth=depth, distribution='xy',
                              add_inputs=['elnet_length', 'foundation_length', 'min_dist' ],
                              title='foundation_length'),
     'driver': CONMINOpt()}
@@ -228,8 +227,8 @@ workflows =   {'driver': ['distribute', 'foundation','wt_dist', 'elnet', 'dist_f
 #objectives =  {'driver': 'foundation.foundation_length'}
 objectives =  {'driver': '0.5 * foundation.foundation_length + 0.5*elnet.elnet_length'}
 
-constraints = {'driver': ['wt_dist.min_dist>0.8', 
-                          'elnet.elnet_length<1.1', 
+constraints = {'driver': ['wt_dist.min_dist>0.8',
+                          'elnet.elnet_length<1.1',
                           'dist_from_borders'
                           ]}
 
@@ -243,7 +242,7 @@ connections = {'distribute.wt_positions': ['foundation.wt_positions',
                'foundation.foundation_length': 'plotting.foundation_length',
                'foundation.foundations': 'plotting.foundations',
                'elnet.elnet_layout': 'plotting.elnet_layout',
-               'elnet.elnet_length': 'plotting.elnet_length',               
+               'elnet.elnet_length': 'plotting.elnet_length',
                'wt_dist.min_dist': 'plotting.min_dist'}
 
 input_parameters = {}
@@ -259,14 +258,14 @@ top.run()
 components = {
     'elnet': ElNetLength(scaling=0.0),
     'foundation': FoundationLength(borders=borders, scaling=0.0, depth=depth),
-    'aep': AEP(wt_layout=wt_layout, 
-               wind_rose=wind_rose, 
+    'aep': AEP(wt_layout=wt_layout,
+               wind_rose=wind_rose,
                wf=FGCLarsen(),
                wind_speeds=[4, 8, 12],
                wind_directions=linspace(0, 360, 12)[:-1],
                scaling=0.0),
     'area': ConverHullArea(wt_layout=wt_layout, scaling=0.0),
-    'dist_from_borders': DistFromBorders(wt_layout=wt_layout, borders=borders, scaling=0.0),    
+    'dist_from_borders': DistFromBorders(wt_layout=wt_layout, borders=borders, scaling=0.0),
     'wt_dist': DistFromTurbines(scaling=wt_desc.rotor_diameter * dist_WT_D),
     'distribute': DistributeFilledPolygon(wt_layout=wt_layout, borders=borders),
     'plotting': OffshorePlot(baseline=baseline, borders=borders, depth=depth, distribution='xy',
@@ -330,7 +329,7 @@ class Optimization(Assembly):
         self.add('paraboloid', Paraboloid())
 
         self.add('driver', COBYLAdriver())
-        
+
         self.driver.add_parameter('paraboloid.x', low=-50, high=50)
         self.driver.add_parameter('paraboloid.y', low=-50, high=50)
 
@@ -356,7 +355,7 @@ class Analysis(Assembly):
 
         self.recorders = [ListCaseRecorder()]
 
-    
+
 
 
 # In[ ]:
@@ -394,10 +393,10 @@ def contour_plot(func):
     ZS = np.array([rose(x1=x, x2=y).f_xy for x,y in zip(XS.flatten(),YS.flatten())]).reshape(XS.shape);
     plt.contourf(XS, YS, ZS, 50);
     plt.colorbar()
-contour_plot(Paraboloid())    
+contour_plot(Paraboloid())
 
 df.plot(x='paraboloid.x', y='paraboloid.y', ls='', marker='.')
-
+plt.show()
 
 # In[ ]:
 
