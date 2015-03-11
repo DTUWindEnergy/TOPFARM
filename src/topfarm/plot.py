@@ -89,10 +89,10 @@ class OffshorePlot(TopfarmComponent):
     elnet_layout = Dict(iotype='in')
     inc = 0
     fs = 15 #Font size
-    
+
     def __init__(self, add_inputs, title='', **kwargs):
         super(OffshorePlot, self).__init__(**kwargs)
-        self.fig = plt.figure(num=None, figsize=(13, 8), dpi=1000, facecolor='w', edgecolor='k')
+        self.fig = plt.figure(num=None, facecolor='w', edgecolor='k') #figsize=(13, 8), dpi=1000
         self.shape_plot = self.fig.add_subplot(121)
         self.objf_plot = self.fig.add_subplot(122)
 
@@ -105,14 +105,14 @@ class OffshorePlot(TopfarmComponent):
 
         #sns.set(style="darkgrid")
         #self.pal = sns.dark_palette("skyblue", as_cmap=True)
-        plt.rc('lines', linewidth=1)        
+        plt.rc('lines', linewidth=1)
         plt.ion()
-        self.force_execute = True 
+        self.force_execute = True
         if not pa('fig').exists():
             pa('fig').mkdir()
 
     def execute(self):
-        plt.ion()     
+        plt.ion()
         if self.inc==0:
             try:
                 pa(self.result_file+'.results').remove()
@@ -132,12 +132,12 @@ class OffshorePlot(TopfarmComponent):
         self.inc += 1
 
     def pre_plot(self):
-        
+
         plt.ion()
         #plt.show()
         ### Plot the water depth
         N = 100
-        self.X, self.Y = plt.meshgrid(plt.linspace(self.depth[:,0].min(), self.depth[:,0].max(), N), 
+        self.X, self.Y = plt.meshgrid(plt.linspace(self.depth[:,0].min(), self.depth[:,0].max(), N),
                                   plt.linspace(self.depth[:,1].min(), self.depth[:,1].max(), N))
         self.Z = plt.griddata(self.depth[:,0],self.depth[:,1],self.depth[:,2],self.X,self.Y, interp='linear')
 
@@ -147,7 +147,7 @@ class OffshorePlot(TopfarmComponent):
         #Z.data[Zin.__neg__()] = -20.0
 
         display(plt.gcf())
-   
+
     # def refresh(self):
         self.shape_plot.clear()
         self.shape_plot.contourf(self.X, self.Y, self.Z, 10, vmax=self.depth[:,2].max())       #, cmap=self.pal
@@ -164,7 +164,7 @@ class OffshorePlot(TopfarmComponent):
 
         self.shape_plot.plot(self.borders[:,0], self.borders[:,1],'k-')
         self.posi = self.shape_plot.plot(self.wt_positions[:,0], self.wt_positions[:,1],'ro')
-        self.plotel = self.shape_plot.plot(np.array([self.baseline[[i,j],0] for i, j in self.elnet_layout.keys()]).T, 
+        self.plotel = self.shape_plot.plot(np.array([self.baseline[[i,j],0] for i, j in self.elnet_layout.keys()]).T,
                                            np.array([self.baseline[[i,j],1]  for i, j in self.elnet_layout.keys()]).T, 'y--', linewidth=1)
         #print self.plotel
 
@@ -186,7 +186,7 @@ class OffshorePlot(TopfarmComponent):
         self.posi[0].set_ydata(self.wt_positions[:,1])
         while len(self.plotel)>0:
             self.plotel.pop(0).remove()
-        self.plotel = self.shape_plot.plot(np.array([self.wt_positions[[i,j],0] for i, j in self.elnet_layout.keys()]).T, 
+        self.plotel = self.shape_plot.plot(np.array([self.wt_positions[[i,j],0] for i, j in self.elnet_layout.keys()]).T,
                                    np.array([self.wt_positions[[i,j],1]  for i, j in self.elnet_layout.keys()]).T, 'y-', linewidth=1)
         for i in range(len(self.posb)):
             self.posb[i][0].set_xdata(self.iterations)
@@ -199,11 +199,10 @@ class OffshorePlot(TopfarmComponent):
         plt.draw()
         #print self.iterations[-1] , ': ' + ', '.join(['%s=%6.2f'%(self.targname[i], targarr[-1,i]) for i in range(len(self.targname))])
         with open(self.result_file+'.results','a') as f:
-            f.write( '%d:'%(self.inc) + ', '.join(['%s=%6.2f'%(self.targname[i], targarr[-1,i]) for i in range(len(self.targname))]) + 
+            f.write( '%d:'%(self.inc) + ', '.join(['%s=%6.2f'%(self.targname[i], targarr[-1,i]) for i in range(len(self.targname))]) +
                 '\n')
         #plt.show()
         #plt.savefig(filename)
         display(plt.gcf())
         #plt.show()
         clear_output(wait=True)
-        

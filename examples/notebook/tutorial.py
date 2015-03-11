@@ -48,7 +48,7 @@ from topfarm.plot import OffshorePlot, PrintOutputs
 from topfarm.tlib import ConverHullArea, DistFromTurbines, PolyFill, document, DistFromBorders
 from topfarm.foundation import FoundationLength
 from topfarm.elnet import ElNetLength, elnet
-#from topfarm.optimizers import *
+from topfarm.optimizers import *
 from topfarm.topfarm import Topfarm
 
 #GCL imports
@@ -105,7 +105,7 @@ dist_WT_D = 3.0
 
 # In[4]:
 
-get_ipython().magic(u'matplotlib inline')
+#get_ipython().magic(u'matplotlib inline')
 import pylab as plt
 plt.rcParams['axes.labelsize'] = 14
 plt.rcParams['legend.fontsize'] = 14
@@ -113,7 +113,7 @@ plt.rcParams['axes.titleweight'] = 'bold'
 plt.rcParams['axes.titlesize'] = 14
 # To see all the options:
 #plt.rcParams.keys()
-plt.show()
+plt.draw()
 
 # In[7]:
 
@@ -135,21 +135,11 @@ ax.set_ylabel('y [m]')
 ax.axis('equal');
 ax.legend(loc='lower left')
 plt.colorbar().set_label('water depth [m]')
-plt.show()
+plt.draw()
 
 # The red points indicate the position of the baseline turbines, the contour plot illustrate the water depth in meters and the red line illustrates the position of the borders limiting the domain of exploration of the optimization.
 
 # #### Plot the wind rose
-
-# In[26]:
-
-class A(object):
-    def run(self,a):
-        return a/0.0
-
-a = A()
-
-a.run(1)
 
 
 # In[8]:
@@ -173,7 +163,7 @@ b = ax2.bar(pi/2.0-np.array(wind_rose.wind_directions)/180.*np.pi - w/2.0,
             np.array(wind_rose.A), width=w)
 ax2.set_xticklabels([u'%d\xb0'%(mirror(d)) for d in linspace(0.0, 360.0,9)[:-1]]);
 ax2.set_title('Weibull A parameter per wind direction sectors');
-plt.show()
+plt.draw()
 
 # ### Setting up TOPFARM
 
@@ -396,9 +386,11 @@ def contour_plot(func):
 contour_plot(Paraboloid())
 
 df.plot(x='paraboloid.x', y='paraboloid.y', ls='', marker='.')
-plt.show()
+plt.draw()
 
 # In[ ]:
+
+plt.show()
 
 
 

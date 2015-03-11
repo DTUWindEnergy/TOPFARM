@@ -43,7 +43,7 @@ from plot import OffshorePlot
 from tlib import ConverHullArea, DistFromTurbines
 from foundation import FoundationLength
 from elnet import ElNetLength, elnet
-from optimizers import *
+#from optimizers import *
 
 
 from openmdao.main.api import Assembly
