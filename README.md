@@ -22,6 +22,9 @@ TOPFARM depends of on [OpenMDAO v0.10.3](https://github.com/OpenMDAO/OpenMDAO-Fr
 
 # Installation
 
+## Docker installation
+If you don't want to go through the painful installation process of openmdao I recommand to use the [docker installation process](http://hub.docker.com/u/piredtu/topfarm/) (hint, if you are a newbie in python and use windows you will prefer this).
+
 ## Automatic installation
 If you are on Linux of MacOSX, you can try to [download](https://raw.githubusercontent.com/DTUWindEnergy/TOPFARM/master/install_all.sh)
  and run the following script to install everything, including OpenMDAO and FUSED-Wind in a new virtual environment
