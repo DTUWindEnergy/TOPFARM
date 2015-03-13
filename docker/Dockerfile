@@ -2,19 +2,23 @@ FROM piredtu/fusedwind
 
 MAINTAINER Pierre-Elouan Rethore <pire@dtu.dk>
 
-WORKDIR /openmdao
+ENV INSTALL_DIR /openmdao
 
-ADD requirements.txt /openmdao/requirements.txt
+WORKDIR $INSTALL_DIR
+
+RUN apt-get install -y subversion
+
+ADD requirements.txt $INSTALL_DIR/requirements.txt
 ADD topfarm.sh /topfarm.sh
+ADD build_topfarm.sh $INSTALL_DIR/build_topfarm.sh
 
-RUN git clone http://github.com/DTUWindEnergy/FUSED-Wake.git /openmdao/FUSED-Wake
-RUN bash -c "source $OPENMDAODIR/bin/activate; python /openmdao/FUSED-Wake/gclarsen/setup.py install"
-RUN bash -c "source $OPENMDAODIR/bin/activate; python /openmdao/FUSED-Wake/py4we/setup.py install"
+RUN chmod +x $INSTALL_DIR/build_topfarm.sh
+RUN chmod +x /topfarm.sh
 
-RUN bash -c "source $OPENMDAODIR/bin/activate; pip install -r /openmdao/requirements.txt"
+RUN bash -c "source $OPENMDAODIR/bin/activate; $INSTALL_DIR/build_topfarm.sh"
 
 RUN ln -s $OPENMDAODIR/src/topfarm /topfarm
 
-WORKDIR /
+WORKDIR /topfarm
 
 CMD ["/topfarm.sh"]
