@@ -15,12 +15,23 @@ pip install numpy
 pip install scipy
 
 echo 'INSTALL OPENMDAO'
+mkdir topfarmv/src
 cd topfarmv/src
 git clone https://github.com/OpenMDAO/OpenMDAO-Framework.git
 cd OpenMDAO-Framework
 git checkout 0.10.3.2
 go-openmdao-dev.py
-cd ../..
+cd ..
+
+echo 'INSTALL FUSED-Wake'
+git clone http://www.github.com/DTUWindEnergy/FUSED-Wake.git
+cd FUSED-Wake/gclarsen
+python setup.py install
+cd ..
+cd py4we
+python setup.py install
+cd ../../..
+
 
 echo 'INSTALL FUSED-Wind + TOPFARM'
 pip install -r http://raw.githubusercontent.com/DTUWindEnergy/TOPFARM/master/remote_install.txt

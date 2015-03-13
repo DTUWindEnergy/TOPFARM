@@ -23,7 +23,6 @@ kwargs = {'author': 'Pierre-Elouan Rethore',
  'install_requires': ['openmdao.main', 'numpy', 'scipy', 'pandas', 'matplotlib', 'seaborn','fusedwind','pyopt', 'pyopt_driver', 'fusedwake'],
  'dependency_links': ['git+http://github.com/FUSED-Wind/fusedwind.git@0.1.0#egg=fusedwind',
                       'svn+http://svn.pyopt.org/tags/release-1.1.0#egg=pyopt',
-                      'git+http://github.com/DTUWindEnergy/FUSED-Wake.git#egg=fusedwake',
                       'git+http://github.com/OpenMDAO-Plugins/pyopt_driver.git@0.19#egg=pyopt_driver'],
  'version': '0.1.0',
  'zip_safe': False}
