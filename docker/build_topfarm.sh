@@ -11,3 +11,4 @@ cd $INSTALL_DIR/FUSED-Wake/py4we
 python setup.py install
 
 pip install -r $INSTALL_DIR/requirements.txt
+pip install tornado --upgrade
