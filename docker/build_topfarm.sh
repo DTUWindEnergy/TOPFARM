@@ -11,4 +11,7 @@ cd $INSTALL_DIR/FUSED-Wake/py4we
 python setup.py install
 
 pip install -r $INSTALL_DIR/requirements.txt
+
+# There are still some weird issue with openmdao downgrading tornado???
+rm -rf /usr/lib/python2.7/dist-packages/*tornado*
 pip install tornado --upgrade
