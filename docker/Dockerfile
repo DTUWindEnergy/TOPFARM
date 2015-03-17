@@ -9,16 +9,14 @@ WORKDIR $INSTALL_DIR
 RUN apt-get install -y subversion
 
 ADD requirements.txt $INSTALL_DIR/requirements.txt
-ADD topfarm.sh /topfarm.sh
 ADD build_topfarm.sh $INSTALL_DIR/build_topfarm.sh
 
 RUN chmod +x $INSTALL_DIR/build_topfarm.sh
-RUN chmod +x /topfarm.sh
 
-RUN bash -c "source $OPENMDAODIR/bin/activate; $INSTALL_DIR/build_topfarm.sh"
+RUN omdao $INSTALL_DIR/build_topfarm.sh
 
 RUN ln -s $OPENMDAODIR/src/topfarm /topfarm
 
 WORKDIR /topfarm
 
-CMD ["/topfarm.sh"]
+CMD omdao /notebook.sh

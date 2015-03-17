@@ -10,8 +10,6 @@ python setup.py install
 cd $INSTALL_DIR/FUSED-Wake/py4we
 python setup.py install
 
-pip install -r $INSTALL_DIR/requirements.txt
-
-# There are still some weird issue with openmdao downgrading tornado???
-rm -rf /usr/lib/python2.7/dist-packages/*tornado*
-pip install tornado --upgrade
+# Fix dependencies from docker_openmdao is deleting the tornado and ipython and replacing it with the new ones
+# It also calls `pip install -r requirements.txt`
+$INSTALL_DIR/fix_dependencies.sh
