@@ -206,3 +206,48 @@ class OffshorePlot(TopfarmComponent):
         display(plt.gcf())
         #plt.show()
         clear_output(wait=True)
+
+def plot_wt_layout(wt_layout, borders=None, depth=None):
+    fig = plt.figure(figsize=(6,6), dpi=2000)
+    fs = 14
+    ax = plt.subplot(111)
+
+    if depth is not None:
+        N = 100
+        X, Y = plt.meshgrid(plt.linspace(depth[:,0].min(), depth[:,0].max(), N), 
+                            plt.linspace(depth[:,1].min(), depth[:,1].max(), N))
+        Z = plt.griddata(depth[:,0],depth[:,1],depth[:,2],X,Y, interp='linear')
+        plt.contourf(X,Y,Z, label='depth [m]')
+        plt.colorbar().set_label('water depth [m]')
+    #ax.plot(wt_layout.wt_positions[:,0], wt_layout.wt_positions[:,1], 'or', label='baseline position')
+    
+    ax.scatter(wt_layout.wt_positions[:,0], wt_layout.wt_positions[:,1], wt_layout._wt_list('rotor_diameter'), label='baseline position')
+
+    if borders is not None:
+        ax.plot(borders[:,0], borders[:,1], 'r--', label='border')
+        
+    ax.set_xlabel('x [m]'); 
+    ax.set_ylabel('y [m]')
+    ax.axis('equal');
+    ax.legend(loc='lower left')
+
+def plot_wind_rose(wind_rose):
+    fig = plt.figure(figsize=(12,5), dpi=1000)
+
+    # Plotting the wind statistics
+    ax1 = plt.subplot(121, polar=True)
+    w = 2.*np.pi/len(wind_rose.frequency)
+    b = ax1.bar(np.pi/2.0-np.array(wind_rose.wind_directions)/180.*np.pi - w/2.0, 
+                np.array(wind_rose.frequency)*100, width=w)
+
+    # Trick to set the right axes (by default it's not oriented as we are used to in the WE community)
+    mirror = lambda d: 90.0 - d if d < 90.0 else 360.0 + (90.0 - d)
+    ax1.set_xticklabels([u'%d\xb0'%(mirror(d)) for d in linspace(0.0, 360.0,9)[:-1]]);
+    ax1.set_title('Wind direction frequency');
+
+    # Plotting the Weibull A parameter
+    ax2 = plt.subplot(122, polar=True)
+    b = ax2.bar(pi/2.0-np.array(wind_rose.wind_directions)/180.*np.pi - w/2.0, 
+                np.array(wind_rose.A), width=w)
+    ax2.set_xticklabels([u'%d\xb0'%(mirror(d)) for d in linspace(0.0, 360.0,9)[:-1]]);
+    ax2.set_title('Weibull A parameter per wind direction sectors');    
