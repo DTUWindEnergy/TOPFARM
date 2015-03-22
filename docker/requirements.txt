@@ -1,3 +1,5 @@
+git+http://github.com/xuy/pyipopt.git#egg=pyopt
+git+http://github.com/OpenMDAO-Plugins/ipoptdriver.git#ipoptdriver
 svn+http://svn.pyopt.org/tags/release-1.1.0#egg=pyopt
 git+http://github.com/OpenMDAO-Plugins/pyopt_driver.git@0.19#egg=pyopt_driver
 -e git+http://github.com/DTUWindEnergy/TOPFARM.git#egg=topfarm
