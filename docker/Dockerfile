@@ -2,6 +2,7 @@ FROM piredtu/fusedwind
 
 MAINTAINER Pierre-Elouan Rethore <pire@dtu.dk>
 
+ENV INSTALL_DIR /openmdao
 WORKDIR $INSTALL_DIR
 
 USER root
