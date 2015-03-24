@@ -6,14 +6,14 @@ ENV INSTALL_DIR /openmdao
 WORKDIR $INSTALL_DIR
 
 USER root
-RUN apt-get install -y subversion
+RUN apt-get install -y subversion wget
 
 ADD requirements.txt $INSTALL_DIR/requirements.txt
 ADD build_topfarm.sh $INSTALL_DIR/build_topfarm.sh
 
 RUN chmod +x $INSTALL_DIR/build_topfarm.sh
 
-RUN omdao $INSTALL_DIR/build_topfarm.sh
+RUN $INSTALL_DIR/build_topfarm.sh
 
 RUN ln -s $OPENMDAODIR/src/topfarm /topfarm
 RUN chown openmdao -R $INSTALLDIR
