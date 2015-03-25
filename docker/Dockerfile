@@ -3,6 +3,7 @@ FROM piredtu/fusedwind
 MAINTAINER Pierre-Elouan Rethore <pire@dtu.dk>
 
 ENV INSTALL_DIR /openmdao
+ENV LD_LIBRARY_PATH /usr/local/lib:/usr/lib:$LD_LIBRARY_PATH
 WORKDIR $INSTALL_DIR
 
 USER root

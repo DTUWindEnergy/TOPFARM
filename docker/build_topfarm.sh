@@ -32,7 +32,3 @@ make install
 # It also calls `pip install -r requirements.txt`
 omdao $INSTALL_DIR/fix_dependencies.sh
 
-touch /root/.bashrc
-touch /home/fusedwind/.bashrc
-echo 'export $LD_LIBRARY_PATH=/usr/local/lib'>>/home/fusedwind/.bashrc
-echo 'export $LD_LIBRARY_PATH=/usr/local/lib'>>/root/.bashrc
