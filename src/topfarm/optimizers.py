@@ -25,7 +25,7 @@ __status__ = "Alpha"
 #                  DakotaVectorStudy
 
 from openmdao.lib.drivers.api import COBYLAdriver, CONMINdriver, NEWSUMTdriver, SLSQPdriver, Genetic
-#from pyopt_driver.pyopt_driver import pyOptDriver
+from pyopt_driver.pyopt_driver import pyOptDriver
 from openmdao.util.testutil import assert_rel_error, assert_raises
 import os.path as path
 
@@ -161,7 +161,7 @@ class GeneticOpt(Genetic):
 
 # PyOPT ----------------------------------------------------------------------------------------------------------------
 #pyopt_methods = ['ALHSO', 'ALPSO', 'COBYLA', 'CONMIN',   'KSOPT', 'NSGA2', 'SLSQP']
-#pyopt_methods = ['ALHSO', 'ALPSO', 'COBYLA', 'CONMIN', 'KSOPT', 'MIDACO', 'NSGA2', 'PSQP', 'SLSQP', 'SOLVOPT']
+pyopt_methods = ['ALHSO', 'ALPSO', 'COBYLA', 'CONMIN', 'KSOPT', 'MIDACO', 'NSGA2', 'PSQP', 'SLSQP', 'SOLVOPT']
 # Not working..
 #'FSQP','GCMMA', 'MIDACO', 'MMA', 'MMFD', 'NLPQL', 'PSQP', 'SNOPT',  'SOLVOPT'
 
@@ -247,14 +247,27 @@ class GeneticOpt(Genetic):
 #         #     }
 #       }
 
-# class PyoptOpt(pyOptDriver):
-#     def __init__(self, method='ALPSO'):
-#         super(PyoptOpt, self).__init__()
-#         self.optimizer = method
-#         self.differentiator = None
-#         self.print_results = False
-#         if self.optimizer in pyopt_options:
-#             self.options = pyopt_options[self.optimizer]
+class PyoptOpt(pyOptDriver):
+    def __init__(self, method='ALPSO', **kwargs):
+        super(PyoptOpt, self).__init__()
+        self.optimizer = method
+        self.differentiator = None
+        self.print_results = False
+        for k,v in kwargs.iteritems():
+            self.options[k] = v
+        #if self.optimizer in pyopt_options:
+        #    self.options = pyopt_options[self.optimizer]
+
+
+
+from ipoptdriver.ipoptdriver import IPOPTdriver
+
+class IpOpt(IPOPTdriver):
+    def __init__(self, **kwargs):
+        super(IpOpt, self).__init__()
+        for k,v in kwargs.iteritems():
+            self.options[k] = v
+
 
 
 # DTU GTO --------------------------------------------------------------------------------------------------------------

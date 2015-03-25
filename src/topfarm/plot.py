@@ -247,7 +247,7 @@ def plot_wind_rose(wind_rose):
 
     # Plotting the Weibull A parameter
     ax2 = plt.subplot(122, polar=True)
-    b = ax2.bar(pi/2.0-np.array(wind_rose.wind_directions)/180.*np.pi - w/2.0, 
+    b = ax2.bar(np.pi/2.0-np.array(wind_rose.wind_directions)/180.*np.pi - w/2.0, 
                 np.array(wind_rose.A), width=w)
     ax2.set_xticklabels([u'%d\xb0'%(mirror(d)) for d in linspace(0.0, 360.0,9)[:-1]]);
     ax2.set_title('Weibull A parameter per wind direction sectors');    

@@ -26,6 +26,7 @@ from openmdao.lib.datatypes.api import VarTree, Float, Slot, Array, List, Int, S
 from numpy import sqrt, argmin, array, zeros, isnan, meshgrid, linspace
 from scipy.interpolate import RectBivariateSpline, LinearNDInterpolator
 #from scipy.spatial import ConvexHull
+from fusedwind.interface import fused_autodoc
 from matplotlib.pyplot import plot
 import numpy as np
 import pandas as pd
@@ -147,14 +148,9 @@ class DistFromTurbines(TopfarmComponent):
 
 def document(cls):
     """Convenient function to document the I/Os of an openmdao class"""
-    obj = cls()
-    print 'INPUTS:\n-------'
-    for var in obj.list_inputs():
-        print var, '=', str(getattr(obj,var)), '\n\t', obj.__base_traits__[var].desc
 
-    print '\nOUTPUTS:\n--------'
-    for var in obj.list_outputs():
-        print var, '=', str(getattr(obj,var)), '\n\t', obj.__base_traits__[var].desc
+    print fused_autodoc(cls).__doc__
+
 
 
 
