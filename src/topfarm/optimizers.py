@@ -259,15 +259,16 @@ class PyoptOpt(pyOptDriver):
         #    self.options = pyopt_options[self.optimizer]
 
 
+try:
+    from ipoptdriver.ipoptdriver import IPOPTdriver
 
-from ipoptdriver.ipoptdriver import IPOPTdriver
-
-class IpOpt(IPOPTdriver):
-    def __init__(self, **kwargs):
-        super(IpOpt, self).__init__()
-        for k,v in kwargs.iteritems():
-            self.options[k] = v
-
+    class IpOpt(IPOPTdriver):
+        def __init__(self, **kwargs):
+            super(IpOpt, self).__init__()
+            for k,v in kwargs.iteritems():
+                self.options[k] = v
+except:
+    print 'ipopt is not installed properly'
 
 
 # DTU GTO --------------------------------------------------------------------------------------------------------------
