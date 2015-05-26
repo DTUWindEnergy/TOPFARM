@@ -20,7 +20,7 @@ cd topfarmv/src
 git clone https://github.com/OpenMDAO/OpenMDAO-Framework.git
 cd OpenMDAO-Framework
 git checkout 0.10.3.2
-go-openmdao-dev.py
+./go-openmdao-dev.py
 cd ..
 
 echo 'INSTALL FUSED-Wake'
