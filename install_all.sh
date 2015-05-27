@@ -1,48 +1,39 @@
 #!/bin/bash
 
-
-if [ ! -x "$(type -p virtualenv)" ]; then
-    echo 'INSTALL Virtualenv'
-    sudo easy_install virtualenv
-fi
-
-echo 'INSTALL own TOPFARM virtual environment'
-virtualenv topfarmv
-. topfarmv/bin/activate
-
-pip install pip --upgrade
-pip install numpy
-pip install scipy
+ROOT=$(pwd)
 
 echo 'INSTALL OPENMDAO'
-mkdir topfarmv/src
-cd topfarmv/src
-git clone https://github.com/OpenMDAO/OpenMDAO-Framework.git
-cd OpenMDAO-Framework
-git checkout 0.10.3.2
-./go-openmdao-dev.py
-cd ..
+mkdir $ROOT/topfarmv
+mkdir $ROOT/topfarmv/src
+SRC=$ROOT/topfarmv/src
 
+
+cd $SRC
+curl http://openmdao.org/releases/0.10.3.2/go-openmdao-0.10.3.2.py | python2
+ln -s $SRC/openmdao-0.10.3.2/bin/activate $ROOT/topfarmv/activate
+. $ROOT/topfarmv/activate
+
+cd $SRC
 echo 'INSTALL FUSED-Wake'
 git clone http://www.github.com/DTUWindEnergy/FUSED-Wake.git
-cd FUSED-Wake/gclarsen
+cd $SRC/FUSED-Wake/gclarsen
 python setup.py install
-cd ..
-cd py4we
+
+cd $SRC/FUSED-Wake/py4we
 python setup.py install
-cd ../../..
 
-
+cd $SRC
 echo 'INSTALL FUSED-Wind + TOPFARM'
 pip install -r http://raw.githubusercontent.com/DTUWindEnergy/TOPFARM/master/remote_install.txt
 
 echo "Did something go wrong in the installation process? Then post an issue about it on https://github.com/DTUWindEnergy/TOPFARM/issues"
 
-echo FUSED-Wind has been installed in editable mode in $(pwd)/topfarmv/src/fusedwind
-echo FUSED-Wake has been installed in editable mode in $(pwd)/topfarmv/src/fusedwake
-echo TOPFARM has been installed in editable mode in $(pwd)/topfarmv/src/topfarm
+echo FUSED-Wind has been installed in editable mode in $ROOT/topfarmv/src/fusedwind
+echo FUSED-Wake has been installed in editable mode in $ROOT/topfarmv/src/fusedwake
+echo TOPFARM has been installed in editable mode in $ROOT/topfarmv/src/topfarm
 
 echo 'To use TOPFARM you first need to activate the virtual environment:'
-echo '$ . topfarmv/bin/activate'
-
+echo '. $ROOT/topfarmv/activate'
+ln -s  $SRC/openmdao-0.10.3.2/src/* $SRC/ 
+cd $ROOT
 
