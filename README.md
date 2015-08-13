@@ -1,4 +1,7 @@
-# Unstable, not running yet....
+# Pre-release, not recommended for production
+* v0.1.0-alpha: Pierre-Elouan Réthoré et al. (2015). TOPFARM: Pre-Release version of TOPFARM. Zenodo. [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.27810.svg)](http://dx.doi.org/10.5281/zenodo.27810)
+
+
 
 Quick question? Post it on gitter:
 
