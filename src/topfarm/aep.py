@@ -181,8 +181,6 @@ class AEP(TopfarmComponent):
         super(AEP, self).__init__(**kwargs)
 
     def execute(self):
-        power_curve = interp1d(self.wf.wt_layout.wt_list[0].power_curve[:,0],
-                               self.wf.wt_layout.wt_list[0].power_curve[:,1])(self.wind_speeds)
 
         # build the cdf vector of the wind speed for each wind rose wind direction sector
         cdfw = []
@@ -214,7 +212,10 @@ class AEP(TopfarmComponent):
 
             # Integrating over the wind speed CDF
             net_aeps[iwd] = np.trapz(powers, cdfw[cwd]) * 365.0 * 24.0
-            gross_aeps[iwd] = np.trapz(power_curve, cdfw[cwd]) * 365.0 * 24.0 * self.wt_positions.shape[0]
+            for i in range(self.wt_positions.shape[0]):
+                power_curve = interp1d(self.wf.wt_layout.wt_list[i].power_curve[:,0],
+                               self.wf.wt_layout.wt_list[0].power_curve[:,1])(self.wind_speeds)
+                gross_aeps[iwd] += np.trapz(power_curve, cdfw[cwd]) * 365.0 * 24.0
 
         # Integrating over the wind direction CDF
         net_aep = np.trapz(net_aeps, cdfd1)
@@ -222,7 +223,6 @@ class AEP(TopfarmComponent):
 
         self.capacity_factor = net_aep / gross_aep
 
-        print self.scaling
         if self.scaling == 0.0:
             # The scaling has to be calculated
             self.scaling = net_aep
