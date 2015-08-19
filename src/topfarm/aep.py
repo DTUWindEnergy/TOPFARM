@@ -214,7 +214,7 @@ class AEP(TopfarmComponent):
             net_aeps[iwd] = np.trapz(powers, cdfw[cwd]) * 365.0 * 24.0
             for i in range(self.wt_positions.shape[0]):
                 power_curve = interp1d(self.wf.wt_layout.wt_list[i].power_curve[:,0],
-                               self.wf.wt_layout.wt_list[0].power_curve[:,1])(self.wind_speeds)
+                                       self.wf.wt_layout.wt_list[i].power_curve[:,1])(self.wind_speeds)
                 gross_aeps[iwd] += np.trapz(power_curve, cdfw[cwd]) * 365.0 * 24.0
 
         # Integrating over the wind direction CDF
