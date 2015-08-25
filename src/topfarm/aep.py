@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from numpy.ma.core import ones_like
 
 __author__ = 'Pierre-Elouan Rethore'
 __email__ = "pire@dtu.dk"
@@ -37,6 +37,7 @@ from fusedwind.plant_flow.comp import GenericWindFarm
 
 # GCLarsen import
 from gclarsen.fused import FGCLarsen
+from FortranWake.fused_fortran import FGCL
 
 from tlib import TopfarmComponent
 
@@ -100,6 +101,13 @@ class TopFGCLarsen(FGCLarsen):
         self.wt_layout.wt_positions = self.wt_positions
         super(TopFGCLarsen, self).execute()
 
+class TopFortranGCLarsen(FGCL):
+    wt_positions = Array([], unit='m', iotype='in', desc='Array of wind turbines attached to particular positions')
+
+    def execute(self):
+        self.wt_layout.wt_positions = self.wt_positions
+        super(TopFGCLarsen, self).execute()
+
 class AEPM(AEPMultipleWindRoses):
     """
     Calculate the AEP of a wind farm. Provide the standard AEPMultipleWindRoses interfaces, with in addition the
@@ -113,8 +121,6 @@ class AEPM(AEPMultipleWindRoses):
         """
         self.wake_model = wake_model
         super(TopAEP, self).__init__(**kwargs)
-
-
 
 
     def configure(self):
@@ -197,6 +203,7 @@ class AEP(TopfarmComponent):
         cwd = 0
         net_aeps = np.zeros([len(self.wind_directions)])
         gross_aeps = np.zeros([len(self.wind_directions)])
+        self.powers = np.zeros([len(self.wind_directions), len(self.wind_speeds)])
         for iwd, wd in enumerate(self.wind_directions):
             if cwd < len(self.wind_rose.wind_directions):
                 while wd >= self.wind_rose.wind_directions[cwd+1] and cwd < len(self.wind_rose.wind_directions)-2:
@@ -209,7 +216,7 @@ class AEP(TopfarmComponent):
                 self.wf.wind_direction=wd
                 self.wf.run()
                 powers[iws] = self.wf.power
-
+            self.powers[iwd,:] = powers
             # Integrating over the wind speed CDF
             net_aeps[iwd] = np.trapz(powers, cdfw[cwd]) * 365.0 * 24.0
             for i in range(self.wt_positions.shape[0]):
@@ -220,6 +227,215 @@ class AEP(TopfarmComponent):
         # Integrating over the wind direction CDF
         net_aep = np.trapz(net_aeps, cdfd1)
         gross_aep = np.trapz(gross_aeps, cdfd1)
+
+        self.capacity_factor = net_aep / gross_aep
+
+        if self.scaling == 0.0:
+            # The scaling has to be calculated
+            self.scaling = net_aep
+
+        self.net_aep = net_aep / self.scaling
+        self.gross_aep = gross_aep
+
+
+class AEPFortran(TopfarmComponent):
+
+    # Inputs
+    wind_speeds = List([], iotype='in', units='m/s',
+        desc='The different wind speeds to run [nWS]')
+
+    wind_directions = List([], iotype='in', units='deg',
+        desc='The different wind directions to run [nWD]')
+
+    turbulence_intensity = Float(0.1, iotype='in',
+        desc='The turbulence intensity at the site')
+
+    wt_positions = Array(iotype='in')
+
+    scaling = Float(1.0, iotype='in', desc='Scaling of the AEP')
+
+    # Outputs
+    array_aep = Array([], iotype='out', units='kW*h',
+        desc='The energy production per sector [nWD, nWS]')
+
+    gross_aep = Float(iotype='out', units='kW*h',
+        desc='Gross Annual Energy Production before availability and loss impacts')
+
+    net_aep = Float(iotype='out', units='kW*h',
+        desc='Net Annual Energy Production after availability and loss impacts')
+
+    capacity_factor = Float(0.0, iotype='out',
+        desc='Capacity factor for wind plant')
+
+
+    def __init__(self, wt_layout, wind_rose, wf, **kwargs):
+        """
+
+        :param wt_layout: GenericWindFarmTurbineLayout()
+        :param wind_rose: WeibullWindRoseVT()
+        :param wf: GenericWindFarm()
+        :param scaling: float [default = 1.0]
+                        The scaling used to calculate the net_aep. If it is set to 0.0, the scaling
+                        will be set to the net_aep the first time the simulation is run.
+        """
+        self.wf = wf
+        self.wf.wt_layout = wt_layout
+        self.wind_rose = wind_rose
+        super(AEPFortran, self).__init__(**kwargs)
+
+    def execute(self):
+
+        # build the cdf vector of the wind speed for each wind rose wind direction sector
+        cdfw = []
+        for iwd, wd in enumerate(self.wind_rose.wind_directions):
+            cdfw.append(weibullCDF(self.wind_speeds, self.wind_rose.A[iwd], self.wind_rose.k[iwd]))
+
+        # calculate the probability in each wind direction sector, using the CDF of the wind rose wind direction
+        cdfd0 = [sum(self.wind_rose.frequency[:i]) for i in range(len(self.wind_rose.frequency)+1)]
+        wd = np.hstack([self.wind_rose.wind_directions, [360]])
+        cdfd1 = interp1d(wd, cdfd0)(self.wind_directions)
+
+        net_aep = 0.0
+        gross_aep = 0.0
+        cwd = 0
+        net_aeps = np.zeros([len(self.wind_directions)])
+        gross_aeps = np.zeros([len(self.wind_directions)])
+        wind_speeds, wind_directions = np.meshgrid(self.wind_speeds, self.wind_directions)
+
+        # Runnning all the wind speeds and wind directions at the same time
+        self.wf.wt_layout.wt_positions=self.wt_positions
+        self.wf.wind_speeds = wind_speeds.flatten()
+        self.wf.wind_directions = wind_directions.flatten()
+        self.wf.turbulence_intensities = self.turbulence_intensity * ones_like(self.wf.wind_directions)
+        self.wf.run()
+        powers = self.wf.wt_power.reshape([len(self.wind_directions),
+                                           len(self.wind_speeds),
+                                           self.wt_positions.shape[0]]).sum(axis=2)
+        self.powers = powers
+
+        for iwd, wd in enumerate(self.wind_directions):
+            if cwd < len(self.wind_rose.wind_directions):
+                while wd >= self.wind_rose.wind_directions[cwd+1] and cwd < len(self.wind_rose.wind_directions)-2:
+                    # switching wind rose wind direction sector
+                    cwd += 1
+            # Integrating over the wind speed CDF
+            net_aeps[iwd] = np.trapz(powers[iwd,:], cdfw[cwd]) * 365.0 * 24.0
+            for i in range(self.wt_positions.shape[0]):
+                power_curve = interp1d(self.wf.wt_layout.wt_list[i].power_curve[:,0],
+                                       self.wf.wt_layout.wt_list[i].power_curve[:,1])(self.wind_speeds)
+                gross_aeps[iwd] += np.trapz(power_curve, cdfw[cwd]) * 365.0 * 24.0
+
+        # Integrating over the wind direction CDF
+        net_aep = np.trapz(net_aeps, cdfd1)
+        gross_aep = np.trapz(gross_aeps, cdfd1)
+
+        self.capacity_factor = net_aep / gross_aep
+
+        if self.scaling == 0.0:
+            # The scaling has to be calculated
+            self.scaling = net_aep
+
+        self.net_aep = net_aep / self.scaling
+        self.gross_aep = gross_aep
+
+
+class AEPFortranMultipleWindRoses(TopfarmComponent):
+
+    # Inputs
+    wind_speeds = List([], iotype='in', units='m/s',
+        desc='The different wind speeds to run [nWS]')
+
+    wind_directions = List([], iotype='in', units='deg',
+        desc='The different wind directions to run [nWD]')
+
+    turbulence_intensity = Float(0.1, iotype='in',
+        desc='The turbulence intensity at the site')
+
+    wt_positions = Array(iotype='in')
+
+    wind_roses = List(iotype='in', desc='List of weibull wind_rose arrays')
+
+    scaling = Float(1.0, iotype='in', desc='Scaling of the AEP')
+
+    # Outputs
+    array_aep = Array([], iotype='out', units='kW*h',
+        desc='The energy production per sector [nWD, nWS]')
+
+    gross_aep = Float(iotype='out', units='kW*h',
+        desc='Gross Annual Energy Production before availability and loss impacts')
+
+    net_aep = Float(iotype='out', units='kW*h',
+        desc='Net Annual Energy Production after availability and loss impacts')
+
+    capacity_factor = Float(0.0, iotype='out',
+        desc='Capacity factor for wind plant')
+
+
+    def __init__(self, wt_layout, wf, **kwargs):
+        """
+
+        :param wt_layout: GenericWindFarmTurbineLayout()
+        :param wf: GenericWindFarm()
+        :param scaling: float [default = 1.0]
+                        The scaling used to calculate the net_aep. If it is set to 0.0, the scaling
+                        will be set to the net_aep the first time the simulation is run.
+        """
+        self.wf = wf
+        self.wf.wt_layout = wt_layout
+        #self.wind_rose = wind_rose
+        super(AEPFortranMultipleWindRoses, self).__init__(**kwargs)
+
+    def execute(self):
+        wt_net_aep = np.zeros([self.wt_positions.shape[0]])
+        wt_gross_aep = np.zeros([self.wt_positions.shape[0]])
+        cwd = 0
+        wind_speeds, wind_directions = np.meshgrid(self.wind_speeds, self.wind_directions)
+
+        # Runnning all the wind speeds and wind directions at the same time
+        self.wf.wt_layout.wt_positions=self.wt_positions
+        self.wf.wind_speeds = wind_speeds.flatten()
+        self.wf.wind_directions = wind_directions.flatten()
+        self.wf.turbulence_intensities = self.turbulence_intensity * ones_like(self.wf.wind_directions)
+        self.wf.run()
+        powers = self.wf.wt_power.reshape([len(self.wind_directions),
+                                           len(self.wind_speeds),
+                                           self.wt_positions.shape[0]])
+        self.powers = powers
+
+        for iwt, wt in enumerate(self.wf.wt_layout.wt_list):
+            net_aeps = np.zeros([len(self.wind_directions)])
+            gross_aeps = np.zeros([len(self.wind_directions)])
+
+            # build the cdf vector of the wind speed for each wind rose wind direction sector
+            cdfw = []
+            for iwd, wd in enumerate(self.wind_roses[iwt].wind_directions):
+                cdfw.append(weibullCDF(self.wind_speeds, self.wind_roses[iwt].A[iwd], self.wind_roses[iwt].k[iwd]))
+
+            # calculate the probability in each wind direction sector, using the CDF of the wind rose wind direction
+            cdfd0 = [sum(self.wind_roses[iwt].frequency[:i]) for i in range(len(self.wind_roses[iwt].frequency)+1)]
+            wd = np.hstack([self.wind_roses[iwt].wind_directions, [360]])
+            cdfd1 = interp1d(wd, cdfd0)(self.wind_directions)
+            cwd = 0
+            for iwd, wd in enumerate(self.wind_directions):
+                # self.wind_directions is not the same as self.wind_roses[iwt].wind_directions, so we have to match both sectors
+                if cwd < len(self.wind_roses[iwt].wind_directions):
+                    while wd >= self.wind_roses[iwt].wind_directions[cwd+1] and \
+                          cwd < len(self.wind_roses[iwt].wind_directions)-2:
+                        # switching wind rose wind direction sector
+                        cwd += 1
+                # Integrating over the wind speed CDF
+                net_aeps[iwd] = np.trapz(powers[iwd,:,iwt], cdfw[cwd]) * 365.0 * 24.0
+                for i in range(self.wt_positions.shape[0]):
+                    power_curve = interp1d(wt.power_curve[:,0],
+                                           wt.power_curve[:,1])(self.wind_speeds)
+                    gross_aeps[iwd] += np.trapz(power_curve, cdfw[cwd]) * 365.0 * 24.0
+
+            # Integrating over the wind direction CDF
+            wt_net_aep[iwt] = np.trapz(net_aeps, cdfd1)
+            wt_gross_aep[iwt] = np.trapz(gross_aeps, cdfd1)
+
+        net_aep = wt_net_aep.sum()
+        gross_aep = wt_gross_aep.sum()
 
         self.capacity_factor = net_aep / gross_aep
 
