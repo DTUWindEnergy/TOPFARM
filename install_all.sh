@@ -7,6 +7,7 @@ mkdir $ROOT/topfarmv
 mkdir $ROOT/topfarmv/src
 SRC=$ROOT/topfarmv/src
 
+pip install numpy scipy
 
 cd $SRC
 curl http://openmdao.org/releases/0.10.3.2/go-openmdao-0.10.3.2.py | python2
